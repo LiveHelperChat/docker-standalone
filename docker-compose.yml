@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+    web:
+        image: nginx:latest
+        ports:
+            - "8081:80"
+        volumes:
+            - ./livehelperchat/lhc_web:/code
+            - ./site.conf:/etc/nginx/conf.d/default.conf
+        depends_on:
+            - db
+            - php
+        networks:
+            - code-network
+    php:
+        build: .
+        image: remdex/livehelperchat-php
+        volumes:
+            - ./livehelperchat/lhc_web:/code
+            - ./zz-zhc.conf:/usr/local/etc/php-fpm.d/zz-zhc.conf
+        networks:
+            - code-network
+    redis:
+        image: "redis:alpine"
+        networks:
+          - code-network
+    db:
+      image: mysql:5
+      environment:
+        MYSQL_ROOT_PASSWORD: lhcroot
+        MYSQL_DATABASE: lhc
+        MYSQL_USER: lhc
+        MYSQL_PASSWORD: lhc
+        TZ: Europe/Moscow
+      volumes:
+        - ./dbdata:/var/lib/mysql
+      ports:
+        - 127.0.0.1:3307:3306
+      networks:
+        - code-network
+      restart: always
+networks:
+    code-network:
+        driver: bridge
