@@ -32,7 +32,7 @@ services:
         MYSQL_DATABASE: lhc
         MYSQL_USER: lhc
         MYSQL_PASSWORD: lhc
-        TZ: Europe/Moscow
+        TZ: UTC
       volumes:
         - ./dbdata:/var/lib/mysql
       ports:
