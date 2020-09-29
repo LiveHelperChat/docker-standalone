@@ -22,7 +22,6 @@ echo "Copying default nodejshelper settings file"
 cd ../../../
 cp livehelperchat/lhc_web/extension/nodejshelper/settings/settings.ini.default.php livehelperchat/lhc_web/extension/nodejshelper/settings/settings.ini.php
 
-cd ../../../
 echo "Activating extensions"
 sed -i "s+// 0 => 'customstatus',+'lhcphpresque','nodejshelper'+g" livehelperchat/lhc_web/settings/settings.ini.default.php
 
