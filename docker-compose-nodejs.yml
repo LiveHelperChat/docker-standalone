@@ -17,7 +17,7 @@ services:
     restart: always
   php:
     build: .
-    image: remdex/livehelperchat-php
+    image: remdex/livehelperchat-php:latest
     volumes:
       - ./livehelperchat/lhc_web:/code
       - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
@@ -29,7 +29,7 @@ services:
     restart: always
   php-cronjob:
     build: ./Dockerfiles/cronjob
-    image: remdex/livehelperchat-php-cronjob
+    image: remdex/livehelperchat-php-cronjob:latest
     volumes:
       - ./livehelperchat/lhc_web:/code
       - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
@@ -40,7 +40,7 @@ services:
     restart: always
   php-resque:
     build: ./Dockerfiles/php-resque
-    image: remdex/livehelperchat-php-resque
+    image: remdex/livehelperchat-php-resque:latest
     volumes:
       - ./livehelperchat/lhc_web:/code
       - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
@@ -51,7 +51,7 @@ services:
     restart: always
   nodejshelper:
     build: ./Dockerfiles/nodejshelper
-    image: remdex/livehelperchat-nodejshelper
+    image: remdex/livehelperchat-nodejshelper:latest
     depends_on:
       - redis
     networks:
