@@ -1,0 +1,8 @@
+@reboot www-data cd /code && ./phpresque.sh >> /dev/null 2>&1
+* * * * * www-data cd /scripts && ./workflow.sh >> /dev/null 2>&1
+* 5 * * * www-data cd /code && /usr/bin/php cron.php -s site_admin -c cron/archive >> /dev/null 2>&1
+* 6 * * * www-data cd /code && /usr/bin/php cron.php -s site_admin -c cron/encrypt >> /dev/null 2>&1
+* 7 * * * www-data cd /code && /usr/bin/php cron.php -s site_admin -c cron/util/maintain_files >> /dev/null 2>&1
+* 8 * * * www-data cd /code && /usr/bin/php cron.php -s site_admin -c cron/util/maintain_database >> /dev/null 2>&1
+40 7 * * * www-data /bin/touch /code/cache/runresque.lock > /dev/null 2>&1
+* * * * * www-data cd /scripts && ./resque.sh >> /dev/null 2>&1

@@ -11,6 +11,7 @@ services:
         depends_on:
             - db
             - php
+            - php-cronjob
         networks:
             - code-network
     php:
@@ -18,7 +19,16 @@ services:
         image: remdex/livehelperchat-php
         volumes:
             - ./livehelperchat/lhc_web:/code
-            - ./zz-zhc.conf:/usr/local/etc/php-fpm.d/zz-zhc.conf
+            - ./lhc:/scripts
+            - ./zz-lhc.conf:/usr/local/etc/php-fpm.d/zz-lhc.conf
+        networks:
+            - code-network
+    php-cronjob:
+        build: ./Dockerfiles/cronjob
+        image: remdex/livehelperchat-php-cronjob
+        volumes:
+            - ./livehelperchat/lhc_web:/code
+            - ./lhc:/scripts
         networks:
             - code-network
     redis:
