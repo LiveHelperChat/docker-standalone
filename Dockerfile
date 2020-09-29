@@ -18,3 +18,7 @@ RUN docker-php-ext-configure gd --with-webp --with-jpeg --with-xpm --with-freety
 RUN docker-php-ext-install gd
 
 RUN pecl install redis && docker-php-ext-enable redis
+
+RUN mkdir /code
+
+RUN chown www-data:www-data /code

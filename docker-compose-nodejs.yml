@@ -7,13 +7,14 @@ services:
       - "8081:80"
     volumes:
       - ./livehelperchat/lhc_web:/code
-      - ./site.conf:/etc/nginx/conf.d/default.conf
+      - ./site-nodejs.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - db
       - php
       - php-cronjob
     networks:
       - code-network
+    restart: always
   php:
     build: .
     image: remdex/livehelperchat-php
@@ -25,6 +26,7 @@ services:
       - ./zz-lhc.conf:/usr/local/etc/php-fpm.d/zz-lhc.conf
     networks:
       - code-network
+    restart: always
   php-cronjob:
     build: ./Dockerfiles/cronjob
     image: remdex/livehelperchat-php-cronjob
@@ -35,6 +37,7 @@ services:
       - ./lhc:/scripts
     networks:
       - code-network
+    restart: always
   php-resque:
     build: ./Dockerfiles/php-resque
     image: remdex/livehelperchat-php-resque
@@ -45,6 +48,7 @@ services:
       - ./lhc:/scripts
     networks:
       - code-network
+    restart: always
   nodejshelper:
     build: ./Dockerfiles/nodejshelper
     image: remdex/livehelperchat-nodejshelper
@@ -59,6 +63,7 @@ services:
     image: "redis:alpine"
     networks:
       - code-network
+    restart: always
   db:
     image: mysql:5
     environment:
