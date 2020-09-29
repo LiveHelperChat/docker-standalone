@@ -1,0 +1,79 @@
+version: '3'
+
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "8081:80"
+    volumes:
+      - ./livehelperchat/lhc_web:/code
+      - ./site.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - db
+      - php
+      - php-cronjob
+    networks:
+      - code-network
+  php:
+    build: .
+    image: remdex/livehelperchat-php
+    volumes:
+      - ./livehelperchat/lhc_web:/code
+      - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
+      - ./NodeJS-Helper/nodejshelper:/code/extension/nodejshelper
+      - ./lhc:/scripts
+      - ./zz-lhc.conf:/usr/local/etc/php-fpm.d/zz-lhc.conf
+    networks:
+      - code-network
+  php-cronjob:
+    build: ./Dockerfiles/cronjob
+    image: remdex/livehelperchat-php-cronjob
+    volumes:
+      - ./livehelperchat/lhc_web:/code
+      - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
+      - ./NodeJS-Helper/nodejshelper:/code/extension/nodejshelper
+      - ./lhc:/scripts
+    networks:
+      - code-network
+  php-resque:
+    build: ./Dockerfiles/php-resque
+    image: remdex/livehelperchat-php-resque
+    volumes:
+      - ./livehelperchat/lhc_web:/code
+      - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
+      - ./NodeJS-Helper/nodejshelper:/code/extension/nodejshelper
+      - ./lhc:/scripts
+    networks:
+      - code-network
+  nodejshelper:
+    build: ./Dockerfiles/nodejshelper
+    image: remdex/livehelperchat-nodejshelper
+    depends_on:
+      - redis
+    networks:
+      - code-network
+    environment:
+      LHC_SECRET_HASH: change_me_after_install
+    restart: always
+  redis:
+    image: "redis:alpine"
+    networks:
+      - code-network
+  db:
+    image: mysql:5
+    environment:
+      MYSQL_ROOT_PASSWORD: lhcroot
+      MYSQL_DATABASE: lhc
+      MYSQL_USER: lhc
+      MYSQL_PASSWORD: lhc
+      TZ: UTC
+    volumes:
+      - ./dbdata:/var/lib/mysql
+    ports:
+      - 127.0.0.1:3307:3306
+    networks:
+      - code-network
+    restart: always
+networks:
+  code-network:
+    driver: bridge

@@ -19,6 +19,8 @@ services:
         image: remdex/livehelperchat-php
         volumes:
             - ./livehelperchat/lhc_web:/code
+            - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
+            - ./NodeJS-Helper/nodejshelper:/code/extension/nodejshelper
             - ./lhc:/scripts
             - ./zz-lhc.conf:/usr/local/etc/php-fpm.d/zz-lhc.conf
         networks:
@@ -28,6 +30,18 @@ services:
         image: remdex/livehelperchat-php-cronjob
         volumes:
             - ./livehelperchat/lhc_web:/code
+            - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
+            - ./NodeJS-Helper/nodejshelper:/code/extension/nodejshelper
+            - ./lhc:/scripts
+        networks:
+            - code-network
+    php-resque:
+        build: ./Dockerfiles/php-resque
+        image: remdex/livehelperchat-php-resque
+        volumes:
+            - ./livehelperchat/lhc_web:/code
+            - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
+            - ./NodeJS-Helper/nodejshelper:/code/extension/nodejshelper
             - ./lhc:/scripts
         networks:
             - code-network
