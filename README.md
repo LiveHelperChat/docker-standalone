@@ -13,9 +13,9 @@
 At first install steps you might need to run these commands to change folders permissions.
 
 ```shell script
-docker exec -it dockerised-php_web_1 chown -R www-data:www-data /code/cache
-docker exec -it dockerised-php_web_1 chown -R www-data:www-data /code/var
-docker exec -it dockerised-php_web_1 chown -R www-data:www-data /code/settings
+docker exec -it docker-standalone_web_1 chown -R www-data:www-data /code/cache
+docker exec -it docker-standalone_web_1 chown -R www-data:www-data /code/settings
+docker exec -it docker-standalone_web_1 chown -R www-data:www-data /code/var
 ```
 
 ### Version with `nodejshelper` plugin
