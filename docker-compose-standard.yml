@@ -37,6 +37,14 @@ services:
         networks:
             - code-network
         restart: always
+    cobrowse:
+        build: ./Dockerfiles/cobrowse
+        image: remdex/livehelperchat-cobrowse:latest
+        ports:
+          - 127.0.0.1:31130:31130
+        networks:
+            - code-network
+        restart: always
     php-resque:
         build: ./Dockerfiles/php-resque
         image: remdex/livehelperchat-php-resque:latest

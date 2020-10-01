@@ -10,7 +10,7 @@ This is dockerized version of Live Helper Chat. It includes these images
 * Database running image
 * NodeJS running image (version with NodeJS)
 
-### Default versions
+## Docker instructions
 
 * Checkout the repository
 * Run `cd docker-standalone`
@@ -45,3 +45,9 @@ livehelperchat/lhc_web/cache
 livehelperchat/lhc_web/settings
 livehelperchat/lhc_web/var
 ```
+
+# After install todo
+
+* Go to `Settings -> Live help confgiuration -> Chat configuration -> (Screen sharing)` and
+    * Check `NodeJs support enabled`
+    * In `socket.io path, optional` enter `/wsnodejs/socket.io`
