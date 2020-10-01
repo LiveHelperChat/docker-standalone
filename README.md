@@ -14,14 +14,20 @@ This is dockerized version of Live Helper Chat. It includes these images
 
 * Checkout the repository
 * Run `cd docker-standalone`
-* Database settings
+* Copy `.env.default` to `.env`
+* Edit `.env` file and change `LHC_SECRET_HASH` to any random string
+* Database default settings if you don't change those in `.env` file.
   * Host - `db` 
   * Database name - `lhc`
   * Database username - `lhc`
   * Database password - `lhc`
-* Edit `docker-compose.yml` if you want to change database logins
-* Run `install.sh` this will checkout Live Helper Chat and required extensions
-* Run `docker-compose up`
+* For standard version without NodeJS plugin run
+     * Run `install.sh` this will checkout Live Helper Chat and required extensions
+     * Run `docker-compose -f docker-compose-standard.yml up`
+* For version with NodeJS plugin
+     * Run `install-nodejs.sh` this will checkout Live Helper Chat and required extensions
+     * Run `docker-compose -f docker-compose-nodejs.yml up`
+
 * Navigate to localhost:8081 and follow install instructions.
 
 At first install steps you might need to run these commands to change folders permissions.
@@ -39,9 +45,3 @@ livehelperchat/lhc_web/cache
 livehelperchat/lhc_web/settings
 livehelperchat/lhc_web/var
 ```
-
-### Version with `nodejshelper` plugin
-
-Pending...
-
-That's it! You have running Live Helper Chat

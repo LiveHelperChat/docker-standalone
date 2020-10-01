@@ -20,6 +20,9 @@ sed -i "s+'localhost'+'redis'+g" lhc-php-resque/lhcphpresque/settings/settings.i
 
 echo "Copying default nodejshelper settings file"
 cp NodeJS-Helper/nodejshelper/settings/settings.ini.default.php NodeJS-Helper/nodejshelper/settings/settings.ini.php
+sed -i "s+'localhost'+'redis'+g" NodeJS-Helper/nodejshelper/settings/settings.ini.php
+sed -i "s+'port' => null+'port' => (!empty(getenv('LHC_NODE_JS_PORT')) \&\& getenv('LHC_NODE_JS_PORT') != 80 \&\& getenv('LHC_NODE_JS_PORT') != 443 ? getenv('LHC_NODE_JS_PORT') : null)+g" NodeJS-Helper/nodejshelper/settings/settings.ini.php
+sed -i "s+'secure' => null+'secure' => (getenv('LHC_NODE_JS_SECURE') == 1 ? true : null)+g" NodeJS-Helper/nodejshelper/settings/settings.ini.php
 
 echo "Activating extensions"
 sed -i "s+// 0 => 'customstatus',+'lhcphpresque','nodejshelper'+g" livehelperchat/lhc_web/settings/settings.ini.default.php

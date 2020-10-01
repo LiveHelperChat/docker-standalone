@@ -1,3 +1,4 @@
+.env
 /dbdata
 /livehelperchat
 /lhc-php-resque
