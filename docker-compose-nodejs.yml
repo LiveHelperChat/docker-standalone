@@ -16,7 +16,7 @@ services:
       - code-network
     restart: always
   php:
-    build: .
+    build: ./Dockerfiles/php
     image: remdex/livehelperchat-php:latest
     environment:
       LHC_SECRET_HASH: ${LHC_SECRET_HASH}
