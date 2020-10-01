@@ -19,4 +19,4 @@ echo "Activating extensions"
 sed -i "s+'force_virtual_host' => false,+'force_virtual_host' => true,+g" livehelperchat/lhc_web/settings/settings.ini.default.php
 sed -i "s+// 0 => 'customstatus',+'lhcphpresque'+g" livehelperchat/lhc_web/settings/settings.ini.default.php
 
-echo "Dependencies installation finished. You now can run 'docker-compose -f docker-compose-standard.yml up' and navigate your browser to http://127.0.0.1:8081 to finish installation"
+echo "Dependencies installation finished. You now can run 'docker-compose -f docker-compose-standard.yml pull && docker-compose -f docker-compose-standard.yml up' and navigate your browser to http://127.0.0.1:8081 to finish installation"

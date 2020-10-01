@@ -23,10 +23,10 @@ This is dockerized version of Live Helper Chat. It includes these images
   * Database password - `lhc`
 * For standard version without NodeJS plugin run
      * Run `install.sh` this will checkout Live Helper Chat and required extensions
-     * Run `docker-compose -f docker-compose-standard.yml up`
+     * Run `docker-compose -f docker-compose-standard.yml pull && docker-compose -f docker-compose-standard.yml up`
 * For version with NodeJS plugin
      * Run `install-nodejs.sh` this will checkout Live Helper Chat and required extensions
-     * Run `docker-compose -f docker-compose-nodejs.yml up`
+     * Run `docker-compose -f docker-compose-nodejs.yml pull && docker-compose -f docker-compose-nodejs.yml up`
 
 * Navigate to localhost:8081 and follow install instructions.
 
