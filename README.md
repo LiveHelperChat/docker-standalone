@@ -7,7 +7,7 @@ This is dockerized version of Live Helper Chat. It includes these images
 * `cobrowse` - cobrowsing running NodeJS service
 * `php-cronjob` - cronjobs running service
 * `php-resque` - php-resque worker running service
-* `nodejshelper` - NodeJS Helper NodeJS running serfice
+* `nodejshelper` - NodeJS Helper NodeJS running service
 * `redis` - Redis service
 * `db` - Database service
 
