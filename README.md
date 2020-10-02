@@ -2,13 +2,14 @@
 
 This is dockerized version of Live Helper Chat. It includes these images
 
-* Nginx running image
-* php-fpm running image
-* Live Helper Chat cronjob running image
-* php-resque running image
-* Redis running image
-* Database running image
-* NodeJS running image (version with NodeJS)
+* `web` - nginx service
+* `php` - php-fpm service
+* `cobrowse` - cobrowsing running NodeJS service
+* `php-cronjob` - cronjobs running service
+* `php-resque` - php-resque worker running service
+* `nodejshelper` - NodeJS Helper NodeJS running serfice
+* `redis` - Redis service
+* `db` - Database service
 
 ## Docker instructions
 
@@ -45,8 +46,19 @@ livehelperchat/lhc_web/cache
 livehelperchat/lhc_web/settings
 livehelperchat/lhc_web/var
 ```
+## How to listen on standard 80 port?
 
-# After install todo
+Edit `.env` file and set `LHC_PUBLIC_PORT` and `LHC_NODE_JS_PORT` port to `80`
+
+## How to setup HTTPS?
+
+That's up to you. You can have in host machine runing nginx and just proxy request or tweak images/docker files I provided. You should play around with `web` service.
+
+## My mails are not sending?
+
+You have to edit back office mail settings and use SMTP.
+
+## After install todo
 
 * Go to `Settings -> Live help confgiuration -> Chat configuration -> (Screen sharing)` and
     * Check `NodeJs support enabled`
