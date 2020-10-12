@@ -22,6 +22,7 @@ services:
       LHC_SECRET_HASH: ${LHC_SECRET_HASH}
       LHC_NODE_JS_PORT: ${LHC_NODE_JS_PORT}
       LHC_NODE_JS_SECURE: ${LHC_NODE_JS_SECURE}
+      LHC_WEBHOOKS_ENABLED: ${LHC_WEBHOOKS_ENABLED}
     volumes:
       - ./livehelperchat/lhc_web:/code
       - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
@@ -60,6 +61,9 @@ services:
       - ./conf/scripts:/scripts
     networks:
       - code-network
+    depends_on:
+      - db
+      - redis
     restart: always
   nodejshelper:
     build: ./Dockerfiles/nodejshelper

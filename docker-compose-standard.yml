@@ -19,6 +19,7 @@ services:
         image: remdex/livehelperchat-php:latest
         environment:
           LHC_SECRET_HASH: ${LHC_SECRET_HASH}
+          LHC_WEBHOOKS_ENABLED: ${LHC_WEBHOOKS_ENABLED}
         volumes:
             - ./livehelperchat/lhc_web:/code
             - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
@@ -55,6 +56,9 @@ services:
         networks:
             - code-network
         restart: always
+        depends_on:
+          - db
+          - redis
     redis:
         image: "redis:alpine"
         networks:

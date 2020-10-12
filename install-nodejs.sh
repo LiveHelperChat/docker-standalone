@@ -27,5 +27,6 @@ sed -i "s+'secure' => null+'secure' => (getenv('LHC_NODE_JS_SECURE') == 1 ? true
 echo "Activating extensions"
 sed -i "s+// 0 => 'customstatus',+'lhcphpresque','nodejshelper'+g" livehelperchat/lhc_web/settings/settings.ini.default.php
 sed -i "s+'force_virtual_host' => false,+'force_virtual_host' => true,+g" livehelperchat/lhc_web/settings/settings.ini.default.php
+sed -i "s+'worker' => 'http'+'worker' => 'resque'+g" livehelperchat/lhc_web/settings/settings.ini.default.php
 
 echo "Dependencies installation finished. You now can run 'docker-compose -f docker-compose-nodejs.yml pull && docker-compose -f docker-compose-nodejs.yml up' and navigate your browser to http://127.0.0.1:8081 to finish installation"

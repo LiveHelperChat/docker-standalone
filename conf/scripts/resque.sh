@@ -9,7 +9,7 @@ fi
 
 fileCron='/scripts/.enable-cron'
 
-if [ -f $fileCron ];
+if [ -f $fileCron ] && [ -f /code/settings/settings.ini.php ];
 then
 
 numberProcess=$(ps aux | grep "[0-9] resque-1.2: *" | awk '{print $2}' | wc -l)
