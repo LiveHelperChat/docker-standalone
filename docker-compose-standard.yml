@@ -8,6 +8,8 @@ services:
         volumes:
             - ./livehelperchat/lhc_web:/code
             - ./conf/nginx/site.conf:/etc/nginx/conf.d/default.conf
+            - ./conf/nginx/mime.types:/etc/nginx/mime.types
+            - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf
         depends_on:
             - db
             - php
