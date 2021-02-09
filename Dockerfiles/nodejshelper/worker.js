@@ -49,14 +49,24 @@ class Worker extends SCWorker {
                 return crypto.createHash('sha1').update(input).digest('hex');
             }
 
-            if (tokenParts[1]) {
+            var isVisitor = false, isChatToken = false;
+
+            if (token.chanelName.indexOf('chat_') !== -1) {
+                var parts = token.chanelName.split('_');
+                // Chat hash
+                var validateVisitorHash = SHA1(tokenParts[1] + 'Visitor' + secretHash + '_' + parts[parts.length - 1]);
+                isChatToken = true;
+            } else {
+                // Online visitor hash
                 var validateVisitorHash = SHA1(tokenParts[1] + 'Visitor' + secretHash);
-                var validateOperatorHash = SHA1(tokenParts[1] + 'Operator' + secretHash);
             }
+
+            var validateOperatorHash = SHA1(tokenParts[1] + 'Operator' + secretHash);
 
             if ((tokenParts[0] == validateVisitorHash) || (tokenParts[0] == validateOperatorHash)) {
                 respond();
-                socket.setAuthToken({token:token.hash, exp: (secNow + 60*30), chanelName:token.chanelName});
+                isVisitor = (tokenParts[0] == validateVisitorHash);
+                socket.setAuthToken({token:token.hash, exp: (secNow + (isVisitor ? 50*60 : 60*12*60)), chanelName:token.chanelName, isChatToken: isChatToken, isVisitor : isVisitor});
             } else {
                 // Passing string as first argument indicates error
                 respond('Login failed');
@@ -65,34 +75,48 @@ class Worker extends SCWorker {
         } else {
             respond('Login failed');
         }
-
-
       });
 
       socket.on('disconnect', function () {
-        //clearInterval(interval);
+          if (socket.authToken !== null && socket.authToken.chanelNameChat && socket.authToken.isVisitor === true) {
+              scServer.exchange.publish(socket.authToken.chanelNameChat, {'op':'vi_online','status':false});
+          }
       });
     });
 
-      scServer.addMiddleware(scServer.MIDDLEWARE_SUBSCRIBE,
-          function (req, next) {
-              var authToken = req.socket.authToken;
-              if (authToken) {
-                  next(); // Allow
-              } else {
-                  next('You are not authorized to subscribe to ' + req.channel); // Block
-              }
-          }
-      );
+    scServer.addMiddleware(scServer.MIDDLEWARE_SUBSCRIBE,
+         function (req, next) {
 
-    scServer.addMiddleware(scServer.MIDDLEWARE_PUBLISH_IN, function (req, next) {
+             var authToken = req.socket.authToken;
+             if (authToken) {
+
+                 if (req.channel.indexOf('chat_') !== -1 && authToken.isVisitor === true) {
+                     // Inform operator that visitor has restored connection
+
+                     if (authToken.isChatToken == true) {
+                         req.socket.authToken.chanelNameChat = req.channel;
+                         scServer.exchange.publish(req.channel, {'op':'vi_online','status':true})
+                     } else {
+                         next('You are not authorized to subscribe to ' + req.channel); // Block
+                     }
+                 }
+
+                 next(); // Allow
+             } else {
+                 next('You are not authorized to subscribe to ' + req.channel); // Block
+             }
+         }
+    );
+
+    /*scServer.addMiddleware(scServer.MIDDLEWARE_PUBLISH_IN, function (req, next) {
       var authToken = req.socket.authToken;
       if (authToken) {
         next();
       } else {
-        next('You are not authorized to publish to ' + req.channel);
+          console.log('block publish');
+          next('You are not authorized to publish to ' + req.channel);
       }
-    });
+    });*/
   }
 }
 

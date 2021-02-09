@@ -19,7 +19,7 @@
     "sc-redis": "^0.2.0",
     "scc-broker-client": "^6.1.0",
     "serve-static": "1.13.2",
-    "socketcluster": "^14.3.5",
+    "socketcluster": "^14.4.2",
     "socketcluster-client": "^13.0.1"
   },
   "keywords": [
