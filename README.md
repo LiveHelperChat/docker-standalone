@@ -34,9 +34,9 @@ This is dockerized version of Live Helper Chat. It includes these images
 At first install steps you might need to run these commands to change folders permissions.
 
 ```shell script
-docker exec -it docker-standalone_web_1 chown -R www-data:www-data /code/cache
-docker exec -it docker-standalone_web_1 chown -R www-data:www-data /code/settings
-docker exec -it docker-standalone_web_1 chown -R www-data:www-data /code/var
+docker exec -it dockerstandalone_web_1 chown -R www-data:www-data /code/cache
+docker exec -it dockerstandalone_web_1 chown -R www-data:www-data /code/settings
+docker exec -it dockerstandalone_web_1 chown -R www-data:www-data /code/var
 ```
 
 or change permission of these folders
