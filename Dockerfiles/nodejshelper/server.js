@@ -48,8 +48,8 @@ var options = {
   logLevel: 1,
   environment: environment,
   brokerOptions: {
-      host: 'redis',
-      port: 6379
+      host: process.env.REDIS_HOST || 'redis',
+      port: process.env.REDIS_PORT || 6379
   },
   secretHash: process.env.LHC_SECRET_HASH, //This secrethash of lhc settings, need for user authenticated
 };
