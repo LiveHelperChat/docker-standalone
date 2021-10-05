@@ -48,10 +48,12 @@ var options = {
   logLevel: 1,
   environment: environment,
   brokerOptions: {
-      host: process.env.REDIS_HOST || 'redis',
-      port: process.env.REDIS_PORT || 6379
+      host: process.env.REDIS_HOST || '127.0.0.1',
+      port: process.env.REDIS_PORT || '6379',
+      auth_pass: process.env.REDIS_PASS || null,
   },
-  secretHash: process.env.LHC_SECRET_HASH, //This secrethash of lhc settings, need for user authenticated
+  secretHash: process.env.LHC_SECRET_HASH, // This secrethash of lhc settings, need for user authenticated
+  trackVisitors: true         // Should we track all online visitors status. For performance reasons makes sense to have it false for very big websites
 };
 
 var bootTimeout = Number(process.env.SOCKETCLUSTER_CONTROLLER_BOOT_TIMEOUT) || 10000;
