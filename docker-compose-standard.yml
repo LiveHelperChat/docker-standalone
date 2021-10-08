@@ -3,6 +3,7 @@ version: '3'
 services:
     web:
         image: nginx:latest
+        env_file: .env
         ports:
             - "${LHC_PUBLIC_PORT}:80"
         volumes:
@@ -19,9 +20,7 @@ services:
     php:
         build: ./Dockerfiles/php
         image: remdex/livehelperchat-php:latest
-        environment:
-          LHC_SECRET_HASH: ${LHC_SECRET_HASH}
-          LHC_WEBHOOKS_ENABLED: ${LHC_WEBHOOKS_ENABLED}
+        env_file: .env
         volumes:
             - ./livehelperchat/lhc_web:/code
             - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
@@ -33,6 +32,7 @@ services:
     php-cronjob:
         build: ./Dockerfiles/cronjob
         image: remdex/livehelperchat-php-cronjob:latest
+        env_file: .env
         volumes:
             - ./livehelperchat/lhc_web:/code
             - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
@@ -51,6 +51,7 @@ services:
     php-resque:
         build: ./Dockerfiles/php-resque
         image: remdex/livehelperchat-php-resque:latest
+        env_file: .env
         volumes:
             - ./livehelperchat/lhc_web:/code
             - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
@@ -68,11 +69,8 @@ services:
         restart: always
     db:
       image: mysql:5
+      env_file: .env
       environment:
-        MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-        MYSQL_DATABASE: ${MYSQL_DATABASE}
-        MYSQL_USER: ${MYSQL_USER}
-        MYSQL_PASSWORD: ${MYSQL_PASSWORD}
         TZ: UTC
       volumes:
         - ./dbdata:/var/lib/mysql
