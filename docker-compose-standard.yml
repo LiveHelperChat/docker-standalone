@@ -68,7 +68,7 @@ services:
           - code-network
         restart: always
     db:
-      image: mysql:5
+      image: mariadb: 10.11.3
       env_file: .env
       environment:
         TZ: UTC
