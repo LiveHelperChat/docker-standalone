@@ -64,6 +64,9 @@ Edit `.env` file and set `LHC_PUBLIC_PORT` and `LHC_NODE_JS_PORT` port to `80`
 
 That's up to you. You can have in host machine runing nginx and just proxy request or tweak images/docker files I provided. You should play around with `web` service.
 
+E.g to the ones who are too lazy too use google :D
+* https://macdonaldchika.medium.com/how-to-install-tls-ssl-on-docker-nginx-container-with-lets-encrypt-5bd3bad1fd48
+
 ## My mails are not sending?
 
 You have to edit back office mail settings and use SMTP.
@@ -105,3 +108,9 @@ cd /code && php cron.php -s site_admin -c cron/util/clear_cache
    * Check `Disable live auto assign`
  * Go to `Settings -> Live help confgiuration -> Chat configuration -> Workflow` and
     * Check `Should cronjob run departments transfer workflow, even if user leaves a chat`
+ * After install make sure `settings/settings.ini.php` file looks like this if you are using `php-resque` and `nodejs`
+ * ```'extensions' =>
+   array (
+   0 => 'lhcphpresque',
+   1 => 'nodejshelper',
+   ),```
