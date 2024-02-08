@@ -1,7 +1,11 @@
 * * * * * www-data cd /scripts && ./workflow.sh >> /dev/null 2>&1
 * * * * * www-data cd /scripts && ./webhook.sh >> /dev/null 2>&1
+* * * * * www-data cd /scripts && ./transfer.sh >> /dev/null 2>&1
 * 5 * * * www-data cd /code && /usr/local/bin/php cron.php -s site_admin -c cron/archive >> /dev/null 2>&1
 * 6 * * * www-data cd /code && /usr/local/bin/php cron.php -s site_admin -c cron/encrypt >> /dev/null 2>&1
+* 6 * * * www-data cd /code && /usr/local/bin/php cron.php -s site_admin -c cron/report  >> /dev/null 2>&1
 * 7 * * * www-data cd /code && /usr/local/bin/php cron.php -s site_admin -c cron/util/maintain_files >> /dev/null 2>&1
 * 8 * * * www-data cd /code && /usr/local/bin/php cron.php -s site_admin -c cron/util/maintain_database >> /dev/null 2>&1
+* * * * * www-data cd /code && /usr/local/bin/php cron.php -s site_admin -c cron/mail/auto_close >> /dev/null 2>&1
 15 */12 * * * www-data cd /code && /usr/local/bin/php cron.php -s site_admin -c cron/stats/department >> /dev/null 2>&1
+*/15 * * * * www-data cd /code && /usr/local/bin/php cron.php -s site_admin -c cron/mail/monitor_mailbox >> /dev/null 2>&1

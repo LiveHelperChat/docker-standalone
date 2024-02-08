@@ -1,7 +1,7 @@
 FROM php:fpm
 
 ENV DEBIAN_FRONTEND noninteractive
-ENV TAG 3.43v
+ENV TAG 4.29v
 
 RUN apt-cache search bcmath
 
@@ -15,8 +15,9 @@ RUN touch /var/log/cron.log
 # Run the command on container startup
 
 RUN apt update && \
-    apt -qy install git unzip procps cron zlib1g-dev curl libzip-dev libonig-dev libpng-dev libwebp-dev libjpeg62-turbo-dev libxpm-dev libfreetype6-dev && \
-    docker-php-ext-install sockets bcmath pcntl zip mbstring mysqli pdo pdo_mysql && \
+    apt -qy install git unzip procps cron zlib1g-dev curl libzip-dev libonig-dev libpng-dev libwebp-dev libjpeg62-turbo-dev libxpm-dev libfreetype6-dev libc-client-dev libkrb5-dev && \
+    docker-php-ext-configure imap --with-kerberos --with-imap-ssl && \
+    docker-php-ext-install sockets bcmath pcntl zip mbstring mysqli pdo pdo_mysql opcache imap && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

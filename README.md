@@ -24,19 +24,28 @@ This is dockerized version of Live Helper Chat. It includes these images
   * Database password - `lhc`
 * For standard version without NodeJS plugin run
      * Run `install.sh` this will checkout Live Helper Chat and required extensions
+     * Run `docker compose -f docker-compose-standard.yml build --no-cache` to build from scratch. You might need it you are running on `linux/arm64` as I only provide `linux/amd64` architecture
      * Run `docker-compose -f docker-compose-standard.yml pull && docker-compose -f docker-compose-standard.yml up`
 * For version with NodeJS plugin
      * Run `install-nodejs.sh` this will checkout Live Helper Chat and required extensions
-     * Run `docker-compose -f docker-compose-nodejs.yml pull && docker-compose -f docker-compose-nodejs.yml up`
-
+     * Run `docker compose -f docker-compose-nodejs.yml build --no-cache` to build from scratch. You might need it you are running on `linux/arm64` as I only provide `linux/amd64` architecture
+     * Run `docker-compose -f docker-compose-nodejs.yml pull && docker-compose -f docker-compose-nodejs.yml up` to use already existingimages
+* You will need to install composer dependencies
+```shell
+docker exec -it docker-standalone-php-1 /bin/bash
+cd /code/
+# Commands from https://getcomposer.org/download/
+php composer.phar install
+```
+* 
 * Navigate to localhost:8081 and follow install instructions.
 
 At first install steps you might need to run these commands to change folders permissions.
 
-```shell script
-docker exec -it dockerstandalone_web_1 chown -R www-data:www-data /code/cache
-docker exec -it dockerstandalone_web_1 chown -R www-data:www-data /code/settings
-docker exec -it dockerstandalone_web_1 chown -R www-data:www-data /code/var
+```shell
+docker exec -it docker-standalone-web-1 chown -R www-data:www-data /code/cache
+docker exec -it docker-standalone-web-1 chown -R www-data:www-data /code/settings
+docker exec -it docker-standalone-web-1 chown -R www-data:www-data /code/var
 ```
 
 or change permission of these folders

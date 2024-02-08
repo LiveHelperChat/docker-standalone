@@ -1,4 +1,4 @@
-FROM node:14.11.0-slim
+FROM node:lts-iron
 
 LABEL maintainer="Remigijus Kiminas"
 LABEL version="1.0"
