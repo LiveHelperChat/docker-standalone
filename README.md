@@ -67,6 +67,53 @@ That's up to you. You can have in host machine runing nginx and just proxy reque
 E.g to the ones who are too lazy too use google :D
 * https://macdonaldchika.medium.com/how-to-install-tls-ssl-on-docker-nginx-container-with-lets-encrypt-5bd3bad1fd48
 
+### Tip commands 
+
+Generate SSL certificate under docker folder for `demo.livehelperchat.com` domain. Change paths in this command.
+
+```
+certbot certonly --config-dir /opt/lhc/docker-standalone/conf/nginx/ssl --webroot --webroot-path /opt/lhc/docker-standalone/livehelperchat/lhc_web -d demo.livehelperchat.com
+```
+
+`web` service part will have to look like
+```yaml
+  web:
+    image: nginx:latest
+    env_file: .env
+    ports:
+      - "${LHC_PUBLIC_PORT}:80"
+      - "443:443"
+    volumes:
+      - ./livehelperchat/lhc_web:/code
+      - ./conf/nginx/site-ssl.conf:/etc/nginx/conf.d/default.conf
+      - ./conf/nginx/mime.types:/etc/nginx/mime.types
+      - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./conf/nginx/ssl/live/demo.livehelperchat.com/fullchain.pem:/etc/nginx/ssl/demo.livehelperchat.com/fullchain.pem
+      - ./conf/nginx/ssl/live/demo.livehelperchat.com/privkey.pem:/etc/nginx/ssl/demo.livehelperchat.com/privkey.pem
+    depends_on:
+      - db
+      - php
+      - php-cronjob
+    networks:
+      - code-network
+    restart: always
+```
+
+Modify `/conf/nginx/site-ssl.conf` and change where you see `demo.livehelperchat.com` to your domain.
+
+Rebuild docker image after a changes.
+
+```
+cd /opt/lhc/docker-standalone && docker compose -f docker-compose-nodejs.yml build --no-cache
+```
+
+Remember to automated SSL issuing workflow :)
+
+```
+cd /opt/lhc/docker-standalone && docker compose -f docker-compose-nodejs.yml down
+cd /opt/lhc/docker-standalone && docker compose -f docker-compose-nodejs.yml up -d
+```
+
 ## My mails are not sending?
 
 You have to edit back office mail settings and use SMTP.
@@ -82,6 +129,8 @@ docker compose -f docker-compose-nodejs.yml build --no-cache
 # I would recommend also just restart composer containers
 docker compose -f docker-compose-nodejs.yml down
 docker compose -f docker-compose-nodejs.yml up
+# OR start docker as service
+docker compose -f docker-compose-nodejs.yml up -d
 
 # All these commands are executed from docker-standalone folder
 cd livehelperchat && git pull origin mail-merge-ms-svelte
