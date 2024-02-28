@@ -133,13 +133,13 @@ docker compose -f docker-compose-nodejs.yml up
 docker compose -f docker-compose-nodejs.yml up -d
 
 # All these commands are executed from docker-standalone folder
-cd livehelperchat && git pull origin mail-merge-ms-svelte
-cd lhc-php-resque && git pull origin master-svelte
+cd livehelperchat && git pull origin master
+cd lhc-php-resque && git pull origin master
 cd NodeJS-Helper && git pull origin master
 
 # Login to php-fpm container and execute
 docker exec -it docker-standalone-php-1 /bin/bash
-# Execute in cotnainer
+# Execute in container
 cd /code && php cron.php -s site_admin -c cron/util/update_database -p local
 cd /code && php cron.php -s site_admin -c cron/util/clear_cache
 
