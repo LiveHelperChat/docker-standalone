@@ -37,7 +37,7 @@ cd /code/
 # Commands from https://getcomposer.org/download/
 php composer.phar install
 ```
-* 
+* Edit `docker-standalone/lhc-php-resque/lhcphpresque/settings/settings.ini.php` and put proper `site_address` domain value. php-resque does not know what domain it's running
 * Navigate to localhost:8081 and follow install instructions.
 * If you want to run docker as a service append `-d` to docker commands. `docker-compose -f docker-compose-nodejs.yml up -d`
 

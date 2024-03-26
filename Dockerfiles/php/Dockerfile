@@ -8,9 +8,9 @@ RUN apt-cache search bcmath
 # Run the command on container startup
 
 RUN apt update && \
-    apt -qy install git unzip zlib1g-dev curl procps libzip-dev libonig-dev libpng-dev libwebp-dev libjpeg62-turbo-dev libxpm-dev libfreetype6-dev libc-client-dev libkrb5-dev && \
+    apt -qy install git unzip zlib1g-dev curl procps libzip-dev libonig-dev libpng-dev libwebp-dev libjpeg62-turbo-dev libxpm-dev libfreetype6-dev libc-client-dev libkrb5-dev libldap2-dev && \
     docker-php-ext-configure imap --with-kerberos --with-imap-ssl && \
-    docker-php-ext-install sockets bcmath pcntl zip mbstring mysqli pdo pdo_mysql opcache imap && \
+    docker-php-ext-install sockets bcmath pcntl zip mbstring mysqli pdo pdo_mysql opcache imap ldap && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
