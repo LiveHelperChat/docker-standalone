@@ -157,6 +157,8 @@ cd /code && php cron.php -s site_admin -c cron/util/clear_cache
    * Check `Disable live auto assign`
  * Go to `Settings -> Live help confgiuration -> Chat configuration -> Workflow` and
     * Check `Should cronjob run departments transfer workflow, even if user leaves a chat`
+ * Set `'site_address' => 'https://chat.example.com'` in `settings/settings.ini.php` to your install installation path. It has to be location where `index.php` is located.
+ * Set `site_address` in `docker-standalone/lhc-php-resque/lhcphpresque/settings/settings.ini.php`
  * After install make sure `settings/settings.ini.php` file looks like this if you are using `php-resque` and `nodejs`
  * ```'extensions' =>
    array (
