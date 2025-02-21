@@ -127,7 +127,7 @@ cd docker-standalone && git pull origin master
 docker compose -f docker-compose-nodejs.yml build --no-cache
 
 # Or just pull new ones
-docker compose pull -f docker-compose-nodejs.yml
+docker-compose -f docker-compose-nodejs.yml pull
 
 # I would recommend also just restart composer containers
 docker compose -f docker-compose-nodejs.yml down
