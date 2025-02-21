@@ -1,4 +1,4 @@
-FROM php:fpm
+FROM php:8.3.17-fpm
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV TAG 4.29v
