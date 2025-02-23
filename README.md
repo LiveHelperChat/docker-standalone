@@ -69,10 +69,16 @@ E.g to the ones who are too lazy too use google :D
 
 ### Tip commands 
 
-Generate SSL certificate under docker folder for `demo.livehelperchat.com` domain. Change paths in this command.
+Generate SSL certificate under docker folder for `demo.livehelperchat.com` domain. Change paths in this command. You have to be pointed domain to your sever
 
 ```
 certbot certonly --config-dir /opt/lhc/docker-standalone/conf/nginx/ssl --webroot --webroot-path /opt/lhc/docker-standalone/livehelperchat/lhc_web -d demo.livehelperchat.com
+```
+
+If you are migrating server and want to setup fresh certbot, you can just use this command
+
+```
+certbot certonly --manual --preferred-challenges http --config-dir /var/www/html/docker-standalone/conf/nginx/ssl -d demo.livehelperchat.com
 ```
 
 `web` service part will have to look like
