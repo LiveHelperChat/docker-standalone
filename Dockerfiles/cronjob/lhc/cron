@@ -1,6 +1,7 @@
 * * * * * www-data cd /scripts && ./workflow.sh >> /dev/null 2>&1
 * * * * * www-data cd /scripts && ./webhook.sh >> /dev/null 2>&1
 * * * * * www-data cd /scripts && ./transfer.sh >> /dev/null 2>&1
+*/5 * * * * www-data cd /scripts && ./cron_5m.sh >> /dev/null 2>&1
 * 5 * * * www-data cd /code && /usr/local/bin/php cron.php -s site_admin -c cron/archive >> /dev/null 2>&1
 * 6 * * * www-data cd /code && /usr/local/bin/php cron.php -s site_admin -c cron/encrypt >> /dev/null 2>&1
 * 6 * * * www-data cd /code && /usr/local/bin/php cron.php -s site_admin -c cron/report  >> /dev/null 2>&1
