@@ -84,7 +84,7 @@ This is how cronjob can look like. Make sure you put your domain and correct `do
 If you are migrating server and want to setup fresh certbot, you can just use this command
 
 ```
-certbot certonly --manual --preferred-challenges http --config-dir /var/www/html/docker-standalone/conf/nginx/ssl -d demo.livehelperchat.com
+certbot certonly --manual --preferred-challenges http --config-dir /opt/lhc/docker-standalone/conf/nginx/ssl -d demo.livehelperchat.com
 ```
 
 `web` service part will have to look like
