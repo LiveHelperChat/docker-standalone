@@ -75,6 +75,12 @@ Generate SSL certificate under docker folder for `demo.livehelperchat.com` domai
 certbot certonly --config-dir /opt/lhc/docker-standalone/conf/nginx/ssl --webroot --webroot-path /opt/lhc/docker-standalone/livehelperchat/lhc_web -d demo.livehelperchat.com
 ```
 
+This is how cronjob can look like. Make sure you put your domain and correct `docker-standalone-web-1` name.
+
+```
+0 0 * * * certbot certonly --keep-until-expiring --config-dir /opt/lhc/docker-standalone/conf/nginx/ssl --webroot --webroot-path /opt/lhc/docker-standalone/livehelperchat/lhc_web -d demo.livehelperchat.com --post-hook "docker restart docker-standalone-web-1" > /dev/null 2>&1
+```
+
 If you are migrating server and want to setup fresh certbot, you can just use this command
 
 ```
