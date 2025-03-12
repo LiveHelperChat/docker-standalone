@@ -1,7 +1,7 @@
-FROM php:8.3.17-fpm
+FROM php:8.4-fpm
 
 ENV DEBIAN_FRONTEND noninteractive
-ENV TAG 4.29v
+ENV TAG 4.53v
 
 RUN apt-cache search bcmath
 
@@ -16,10 +16,11 @@ RUN touch /var/log/cron.log
 
 RUN apt update && \
     apt -qy install git unzip procps cron zlib1g-dev curl libzip-dev libonig-dev libpng-dev libwebp-dev libjpeg62-turbo-dev libxpm-dev libfreetype6-dev libc-client-dev libkrb5-dev  libldap2-dev && \
-    docker-php-ext-configure imap --with-kerberos --with-imap-ssl && \
-    docker-php-ext-install sockets bcmath pcntl zip mbstring mysqli pdo pdo_mysql opcache imap ldap && \
+    docker-php-ext-install sockets bcmath pcntl zip mbstring mysqli pdo pdo_mysql opcache ldap && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+RUN pecl install imap && docker-php-ext-enable imap
 
 RUN docker-php-ext-configure gd --with-webp --with-jpeg --with-xpm --with-freetype
 
