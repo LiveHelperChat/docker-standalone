@@ -22,14 +22,15 @@ This is dockerized version of Live Helper Chat. It includes these images
   * Database name - `lhc`
   * Database username - `lhc`
   * Database password - `lhc`
-* For standard version without NodeJS plugin run
+* For version with **NodeJS plugin (Recommended)**
+  * Run `install-nodejs.sh` this will checkout Live Helper Chat and required extensions
+  * **Optional**. Run `docker compose -f docker-compose-nodejs.yml build --no-cache` to build from scratch. You might need it you are running on `linux/arm64` as I only provide `linux/amd64` architecture
+  * Run `docker compose -f docker-compose-nodejs.yml pull && docker-compose -f docker-compose-nodejs.yml up` to use already existingimages
+* For standard version **without NodeJS** plugin run
      * Run `install.sh` this will checkout Live Helper Chat and required extensions
-     * Run `docker compose -f docker-compose-standard.yml build --no-cache` to build from scratch. You might need it you are running on `linux/arm64` as I only provide `linux/amd64` architecture
+     * **Optional**. Run `docker compose -f docker-compose-standard.yml build --no-cache` to build from scratch. Build is optional. You might need it you are running on `linux/arm64` as I only provide `linux/amd64` architecture
      * Run `docker compose -f docker-compose-standard.yml pull && docker-compose -f docker-compose-standard.yml up`
-* For version with NodeJS plugin
-     * Run `install-nodejs.sh` this will checkout Live Helper Chat and required extensions
-     * Run `docker compose -f docker-compose-nodejs.yml build --no-cache` to build from scratch. You might need it you are running on `linux/arm64` as I only provide `linux/amd64` architecture
-     * Run `docker compose -f docker-compose-nodejs.yml pull && docker-compose -f docker-compose-nodejs.yml up` to use already existingimages
+
 * You will need to install composer dependencies
 ```shell
 docker exec -it docker-standalone-php-1 /bin/bash
