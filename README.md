@@ -31,13 +31,16 @@ This is dockerized version of Live Helper Chat. It includes these images
      * **Optional**. Run `docker compose -f docker-compose-standard.yml build --no-cache` to build from scratch. Build is optional. You might need it you are running on `linux/arm64` as I only provide `linux/amd64` architecture
      * Run `docker compose -f docker-compose-standard.yml pull && docker-compose -f docker-compose-standard.yml up`
 
-* You will need to install composer dependencies
-```shell
-docker exec -it docker-standalone-php-1 /bin/bash
-cd /code/
-# Commands from https://getcomposer.org/download/
-php composer.phar install
-```
+* You will need to install composer dependencies:
+  1. Open a shell in the docker container
+     ```shell
+     docker exec -it --workdir /code docker-standalone-php-1 /bin/bash
+     ```
+  2. Visit https://getcomposer.org/download/ and run the commands to get `composer.phar`
+  3. Run this to actually install the dependencies:
+     ```shell
+     php composer.phar install
+     ```
 * Edit `docker-standalone/lhc-php-resque/lhcphpresque/settings/settings.ini.php` and put proper `site_address` domain value. php-resque does not know what domain it's running
 * Navigate to localhost:8081 and follow install instructions.
 * If you want to run docker as a service append `-d` to docker commands. `docker-compose -f docker-compose-nodejs.yml up -d`
