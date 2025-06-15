@@ -2,16 +2,16 @@
 
 echo "Cloning Live Helper Chat repository"
 #git clone https://github.com/LiveHelperChat/livehelperchat.git
-git clone --branch master https://github.com/LiveHelperChat/livehelperchat.git --depth 10
+git clone --branch master https://github.com/LiveHelperChat/livehelperchat.git --depth 1
 
 echo "Cloning php-resque repository"
-git clone --branch master https://github.com/LiveHelperChat/lhc-php-resque.git --depth 10
+git clone --branch master https://github.com/LiveHelperChat/lhc-php-resque.git --depth 1
 
 echo "Copying resque file to lhc_web"
 cp lhc-php-resque/lhcphpresque/doc/resque.php livehelperchat/lhc_web
 
 echo "Cloning NodeJS repository"
-git clone https://github.com/LiveHelperChat/NodeJS-Helper.git
+git clone https://github.com/LiveHelperChat/NodeJS-Helper.git --depth 1
 
 echo "Copying default lhcphpresque settings file"
 cp lhc-php-resque/lhcphpresque/settings/settings.ini.default.php lhc-php-resque/lhcphpresque/settings/settings.ini.php
