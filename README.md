@@ -50,7 +50,7 @@ docker exec -it docker-standalone-web-1 chown -R www-data:www-data /code/var
 ```
 * Navigate to localhost:8081 and follow install instructions.
   * db username and password: Check `.env` file
-  * db host: `docker-standalone-db-1`.
+  * db host: `db`.
   * db port: 3306
 * If you want to run docker as a service append `-d` to docker commands. `docker-compose -f docker-compose-nodejs.yml up -d`
 
