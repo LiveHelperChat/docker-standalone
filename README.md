@@ -22,40 +22,38 @@ This is dockerized version of Live Helper Chat. It includes these images
   * Database name - `lhc`
   * Database username - `lhc`
   * Database password - `lhc`
-* For standard version without NodeJS plugin run
+* For version with **NodeJS plugin (Recommended)**
+  * Run `install-nodejs.sh` this will checkout Live Helper Chat and required extensions
+  * **Optional**. Run `docker compose -f docker-compose-nodejs.yml build --no-cache` to build from scratch. You might need it you are running on `linux/arm64` as I only provide `linux/amd64` architecture
+  * Run `docker compose -f docker-compose-nodejs.yml pull && docker-compose -f docker-compose-nodejs.yml up` to use already existingimages
+* For standard version **without NodeJS** plugin run
      * Run `install.sh` this will checkout Live Helper Chat and required extensions
-     * Run `docker compose -f docker-compose-standard.yml build --no-cache` to build from scratch. You might need it you are running on `linux/arm64` as I only provide `linux/amd64` architecture
+     * **Optional**. Run `docker compose -f docker-compose-standard.yml build --no-cache` to build from scratch. Build is optional. You might need it you are running on `linux/arm64` as I only provide `linux/amd64` architecture
      * Run `docker compose -f docker-compose-standard.yml pull && docker-compose -f docker-compose-standard.yml up`
-* For version with NodeJS plugin
-     * Run `install-nodejs.sh` this will checkout Live Helper Chat and required extensions
-     * Run `docker compose -f docker-compose-nodejs.yml build --no-cache` to build from scratch. You might need it you are running on `linux/arm64` as I only provide `linux/amd64` architecture
-     * Run `docker compose -f docker-compose-nodejs.yml pull && docker-compose -f docker-compose-nodejs.yml up` to use already existingimages
-* You will need to install composer dependencies
-```shell
-docker exec -it docker-standalone-php-1 /bin/bash
-cd /code/
-# Commands from https://getcomposer.org/download/
-php composer.phar install
-```
+
+* You will need to install composer dependencies:
+  1. Open a shell in the docker container
+     ```shell
+     docker exec -it --workdir /code docker-standalone-php-1 /bin/bash
+     ```
+  2. Visit https://getcomposer.org/download/ and run the commands to get `composer.phar`
+  3. Run this to actually install the dependencies:
+     ```shell
+     php composer.phar install
+     ```
 * Edit `docker-standalone/lhc-php-resque/lhcphpresque/settings/settings.ini.php` and put proper `site_address` domain value. php-resque does not know what domain it's running
-* Navigate to localhost:8081 and follow install instructions.
-* If you want to run docker as a service append `-d` to docker commands. `docker-compose -f docker-compose-nodejs.yml up -d`
-
-At first install steps you might need to run these commands to change folders permissions.
-
+* Make sure the `cache`, `settings` and `var` folders have the correct permissions:
 ```shell
 docker exec -it docker-standalone-web-1 chown -R www-data:www-data /code/cache
 docker exec -it docker-standalone-web-1 chown -R www-data:www-data /code/settings
 docker exec -it docker-standalone-web-1 chown -R www-data:www-data /code/var
 ```
+* Navigate to localhost:8081 and follow install instructions.
+  * db username and password: Check `.env` file
+  * db host: `db`.
+  * db port: 3306
+* If you want to run docker as a service append `-d` to docker commands. `docker-compose -f docker-compose-nodejs.yml up -d`
 
-or change permission of these folders
-
-```
-livehelperchat/lhc_web/cache
-livehelperchat/lhc_web/settings
-livehelperchat/lhc_web/var
-```
 ## How to listen on standard 80 port?
 
 Edit `.env` file and set `LHC_PUBLIC_PORT` and `LHC_NODE_JS_PORT` port to `80`
