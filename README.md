@@ -180,3 +180,38 @@ cd /code && php cron.php -s site_admin -c cron/util/clear_cache
    0 => 'lhcphpresque',
    1 => 'nodejshelper',
    ),```
+
+## How to run everything under proxy with HTTPS support?
+
+```apacheconf
+server {
+    listen         *:80; # This line should be gone once SSL is setup
+    server_name    server_name chat.example.com; # Change to your domain
+
+    location / {
+	      proxy_set_header X-Real-IP $remote_addr;
+	      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+	      proxy_set_header Host $http_host;
+	      proxy_set_header X-NginX-Proxy true;
+	      # Uncomment below two lines if you are running under https. So LHC will pickup https correctly
+	      # proxy_set_header X-Forwarded-Proto https;
+	      # proxy_set_header X-Forwarded-Ssl on;
+
+	      proxy_pass http://localhost:8081/; # Change port to your docker public port
+	      proxy_redirect off;
+          proxy_http_version 1.1;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection "upgrade";
+    }
+    
+    # Those will appear automaticlaly once you setup SSL using certbot
+    # listen 443 ssl; # managed by Certbot
+    # ssl_certificate /etc/letsencrypt/live/chat.example.com/fullchain.pem; # managed by Certbot
+    # ssl_certificate_key /etc/letsencrypt/live/chat.example.com/privkey.pem; # managed by Certbot
+    # include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    # ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+```
+
+* (Required) Set to true so IP will be detected correctly under proxy - https://github.com/LiveHelperChat/livehelperchat/blob/3e5d1249faddb15273e6897492edcd3798074b36/lhc_web/settings/settings.ini.default.php#L20
+* (Optional) In `System configuration > Live help configuration -> Chat configuration -> Misc` under `Please enter explicit http mode. Either http: or https:, do not forget : at the end.` enter `https:` it will force always to use HTTPS once setup.
