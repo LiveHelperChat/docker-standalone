@@ -46,6 +46,7 @@ services:
       - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
       - ./NodeJS-Helper/nodejshelper:/code/extension/nodejshelper
       - ./conf/scripts:/scripts
+      - ./conf/php/cronjob.ini:/usr/local/etc/php/conf.d/zz-lhc.ini
     networks:
       - code-network
     restart: always
@@ -58,6 +59,7 @@ services:
       - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
       - ./NodeJS-Helper/nodejshelper:/code/extension/nodejshelper
       - ./conf/scripts:/scripts
+      - ./conf/php/resque.ini:/usr/local/etc/php/conf.d/zz-lhc.ini
     networks:
       - code-network
     depends_on:

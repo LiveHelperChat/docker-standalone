@@ -35,6 +35,7 @@ services:
             - ./livehelperchat/lhc_web:/code
             - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
             - ./conf/scripts:/scripts
+            - ./conf/php/cronjob.ini:/usr/local/etc/php/conf.d/zz-lhc.ini
         networks:
             - code-network
         restart: always
@@ -54,6 +55,7 @@ services:
             - ./livehelperchat/lhc_web:/code
             - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
             - ./conf/scripts:/scripts
+            - ./conf/php/resque.ini:/usr/local/etc/php/conf.d/zz-lhc.ini
         networks:
             - code-network
         restart: always
