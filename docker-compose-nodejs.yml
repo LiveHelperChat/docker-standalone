@@ -1,6 +1,10 @@
 services:
   web:
     image: 'nginx:latest'
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
     environment:
       - 'COOLIFY_URL=https://chat.flexbiz.ro:80'
     volumes:
@@ -23,6 +27,10 @@ services:
   php:
     build: /data/docker-standalone/Dockerfiles/php
     image: 'remdex/livehelperchat-php:latest'
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
     environment:
       - 'LHC_SECRET_HASH=${SERVICE_PASSWORD_SECRETHASH}'
       - LHC_WEBHOOKS_ENABLED=1
@@ -51,6 +59,10 @@ services:
   cobrowse:
     build: /data/docker-standalone/Dockerfiles/cobrowse
     image: 'remdex/livehelperchat-cobrowse:latest'
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
     ports:
       - '127.0.0.1:31130:31130'
     networks:
@@ -59,6 +71,10 @@ services:
   php-cronjob:
     build: /data/docker-standalone/Dockerfiles/cronjob
     image: 'remdex/livehelperchat-php-cronjob:latest'
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
     environment:
       - 'LHC_SECRET_HASH=${SERVICE_PASSWORD_SECRETHASH}'
       - LHC_WEBHOOKS_ENABLED=1
@@ -75,12 +91,17 @@ services:
       - '/data/docker-standalone/lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque'
       - '/data/docker-standalone/NodeJS-Helper/nodejshelper:/code/extension/nodejshelper'
       - '/data/docker-standalone/conf/scripts:/scripts'
+      - '/data/docker-standalone/conf/php/cronjob.ini:/usr/local/etc/php/conf.d/zz-lhc.ini'
     networks:
       - code-network
     restart: always
   php-resque:
     build: /data/docker-standalone/Dockerfiles/php-resque
     image: 'remdex/livehelperchat-php-resque:latest'
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
     environment:
       - 'LHC_SECRET_HASH=${SERVICE_PASSWORD_SECRETHASH}'
       - LHC_WEBHOOKS_ENABLED=1
@@ -97,6 +118,7 @@ services:
       - '/data/docker-standalone/lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque'
       - '/data/docker-standalone/NodeJS-Helper/nodejshelper:/code/extension/nodejshelper'
       - '/data/docker-standalone/conf/scripts:/scripts'
+      - '/data/docker-standalone/conf/php/resque.ini:/usr/local/etc/php/conf.d/zz-lhc.ini'
     networks:
       - code-network
     depends_on:
@@ -106,6 +128,10 @@ services:
   nodejshelper:
     build: /data/docker-standalone/Dockerfiles/nodejshelper
     image: 'remdex/livehelperchat-nodejshelper:latest'
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
     environment:
       - 'LHC_SECRET_HASH=${SERVICE_PASSWORD_SECRETHASH}'
       - LHC_WEBHOOKS_ENABLED=1
@@ -124,11 +150,19 @@ services:
     restart: always
   redis:
     image: 'redis:alpine'
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
     networks:
       - code-network
     restart: always
   db:
     image: mariadb
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
     environment:
       - TZ=UTC
       - 'MYSQL_ROOT_PASSWORD=${SERVICE_PASSWORD_MYSQLROOT}'

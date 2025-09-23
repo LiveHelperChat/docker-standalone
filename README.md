@@ -24,32 +24,29 @@ This is dockerized version of Live Helper Chat. It includes these images
      * **Optional**. Run `docker compose -f docker-compose-standard.yml build --no-cache` to build from scratch. Build is optional. You might need it you are running on `linux/arm64` as I only provide `linux/amd64` architecture
      * Run `docker compose -f docker-compose-standard.yml pull && docker-compose -f docker-compose-standard.yml up`
 
-* You will need to install composer dependencies
-```shell
-docker exec -it docker-standalone-php-1 /bin/bash
-cd /code/
-# Commands from https://getcomposer.org/download/
-php composer.phar install
-```
+* You will need to install composer dependencies:
+  1. Open a shell in the docker container
+     ```shell
+     docker exec -it --workdir /code docker-standalone-php-1 /bin/bash
+     ```
+  2. Visit https://getcomposer.org/download/ and run the commands to get `composer.phar`
+  3. Run this to actually install the dependencies:
+     ```shell
+     php composer.phar install
+     ```
 * Edit `docker-standalone/lhc-php-resque/lhcphpresque/settings/settings.ini.php` and put proper `site_address` domain value. php-resque does not know what domain it's running
-* Navigate to localhost:8081 and follow install instructions.
-* If you want to run docker as a service append `-d` to docker commands. `docker-compose -f docker-compose-nodejs.yml up -d`
-
-At first install steps you might need to run these commands to change folders permissions.
-
+* Make sure the `cache`, `settings` and `var` folders have the correct permissions:
 ```shell
 docker exec -it docker-standalone-web-1 chown -R www-data:www-data /code/cache
 docker exec -it docker-standalone-web-1 chown -R www-data:www-data /code/settings
 docker exec -it docker-standalone-web-1 chown -R www-data:www-data /code/var
 ```
+* Navigate to localhost:8081 and follow install instructions.
+  * db username and password: Check `.env` file
+  * db host: `db`.
+  * db port: 3306
+* If you want to run docker as a service append `-d` to docker commands. `docker-compose -f docker-compose-nodejs.yml up -d`
 
-or change permission of these folders
-
-```
-livehelperchat/lhc_web/cache
-livehelperchat/lhc_web/settings
-livehelperchat/lhc_web/var
-```
 ## How to listen on standard 80 port?
 
 Edit `.env` file and set `LHC_PUBLIC_PORT` and `LHC_NODE_JS_PORT` port to `80`
@@ -174,3 +171,38 @@ cd /code && php cron.php -s site_admin -c cron/util/clear_cache
    0 => 'lhcphpresque',
    1 => 'nodejshelper',
    ),```
+
+## How to run everything under proxy with HTTPS support?
+
+```apacheconf
+server {
+    listen         *:80; # This line should be gone once SSL is setup
+    server_name    server_name chat.example.com; # Change to your domain
+
+    location / {
+	      proxy_set_header X-Real-IP $remote_addr;
+	      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+	      proxy_set_header Host $http_host;
+	      proxy_set_header X-NginX-Proxy true;
+	      # Uncomment below two lines if you are running under https. So LHC will pickup https correctly
+	      # proxy_set_header X-Forwarded-Proto https;
+	      # proxy_set_header X-Forwarded-Ssl on;
+
+	      proxy_pass http://localhost:8081/; # Change port to your docker public port
+	      proxy_redirect off;
+          proxy_http_version 1.1;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection "upgrade";
+    }
+    
+    # Those will appear automaticlaly once you setup SSL using certbot
+    # listen 443 ssl; # managed by Certbot
+    # ssl_certificate /etc/letsencrypt/live/chat.example.com/fullchain.pem; # managed by Certbot
+    # ssl_certificate_key /etc/letsencrypt/live/chat.example.com/privkey.pem; # managed by Certbot
+    # include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    # ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+```
+
+* (Required) Set to true so IP will be detected correctly under proxy - https://github.com/LiveHelperChat/livehelperchat/blob/3e5d1249faddb15273e6897492edcd3798074b36/lhc_web/settings/settings.ini.default.php#L20
+* (Optional) In `System configuration > Live help configuration -> Chat configuration -> Misc` under `Please enter explicit http mode. Either http: or https:, do not forget : at the end.` enter `https:` it will force always to use HTTPS once setup.
