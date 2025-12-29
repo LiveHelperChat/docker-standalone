@@ -39,6 +39,7 @@ This is dockerized version of Live Helper Chat. It includes these images
   2. Visit https://getcomposer.org/download/ and run the commands to get `composer.phar`
   3. Run this to actually install the dependencies:
      ```shell
+     php composer.phar update
      php composer.phar install
      ```
 * Edit `docker-standalone/lhc-php-resque/lhcphpresque/settings/settings.ini.php` and put proper `site_address` domain value. php-resque does not know what domain it's running
@@ -130,6 +131,7 @@ You have to edit back office mail settings and use SMTP.
 
 ## How to update?
 
+
 ```shell
 # Update docker images
 cd docker-standalone && git pull origin master
@@ -152,10 +154,11 @@ cd NodeJS-Helper && git pull origin master
 
 # Login to php-fpm container and execute
 docker exec -it docker-standalone-php-1 /bin/bash
-# Execute in container
+# Execute in container. You might need to download composer.phar file
+cd /code && php composer.phar update
+cd /code && php composer.phar install
 cd /code && php cron.php -s site_admin -c cron/util/update_database -p local
 cd /code && php cron.php -s site_admin -c cron/util/clear_cache
-
 ```
 
 ## After install todo
