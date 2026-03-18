@@ -53,7 +53,7 @@ var options = {
       auth_pass: process.env.REDIS_PASS || null,
   },
   secretHash: process.env.LHC_SECRET_HASH, // This secrethash of lhc settings, need for user authenticated
-  trackVisitors: true         // Should we track all online visitors status. For performance reasons makes sense to have it false for very big websites
+  trackVisitors: process.env.LHC_NODEJS_TRACK_VISITORS == '1'         // Should we track all online visitors status. For performance reasons makes sense to have it false for very big websites
 };
 
 var bootTimeout = Number(process.env.SOCKETCLUSTER_CONTROLLER_BOOT_TIMEOUT) || 10000;
