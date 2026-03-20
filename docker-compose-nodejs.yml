@@ -121,6 +121,8 @@ services:
       - ./dbdata:/var/lib/mysql
     ports:
       - 127.0.0.1:3307:3306
+    command:
+      - "--innodb-buffer-pool-size=256M"
     networks:
       - code-network
     restart: always
