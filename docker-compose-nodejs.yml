@@ -79,6 +79,7 @@ services:
       - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
       - ./NodeJS-Helper/nodejshelper:/code/extension/nodejshelper
       - ./conf/scripts:/scripts
+      - ./.env:/scripts/.env:ro
       - ./conf/php/resque.ini:/usr/local/etc/php/conf.d/zz-lhc.ini
     networks:
       - code-network

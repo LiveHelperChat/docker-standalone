@@ -9,12 +9,22 @@ fi
 
 fileCron='/scripts/.enable-cron'
 
+# Cron jobs do not inherit docker env vars, so read worker count from mounted env file.
+workers_count=''
+if [ -f /scripts/.env ]; then
+    workers_count=$(sed -n 's/^LHC_RESQUE_WORKERS_COUNT=//p' /scripts/.env | head -n 1)
+fi
+
+case "$workers_count" in
+    ''|*[!0-9]*) workers_count=2 ;;
+esac
+
 if [ -f $fileCron ] && [ -f /code/settings/settings.ini.php ];
 then
 
 numberProcess=$(ps aux | grep "[0-9] resque-1.2: *" | awk '{print $2}' | wc -l)
 
-if (( $numberProcess > 2 ));
+if (( $numberProcess > $workers_count ));
 then
   echo "To many running process..."
   exit 1
