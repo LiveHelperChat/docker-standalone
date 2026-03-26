@@ -182,6 +182,10 @@ cd /code && php cron.php -s site_admin -c cron/util/clear_cache
    1 => 'nodejshelper',
    ),```
 
+## How to dump database?
+
+As there is no mysql or mysqldump inside of containers docker mysql can be reached using `127.0.0.1:3307` so you can use master host where all your containers are running and just dump database.
+
 ## How to run everything under proxy with HTTPS support?
 
 ```apacheconf
