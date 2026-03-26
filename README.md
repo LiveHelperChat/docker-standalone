@@ -112,10 +112,10 @@ certbot certonly --manual --preferred-challenges http --config-dir /opt/lhc/dock
 
 Modify `/conf/nginx/site-ssl.conf` and change where you see `demo.livehelperchat.com` to your domain.
 
-Rebuild docker image after a changes.
+Re-create docker image after a changes.
 
 ```
-cd /opt/lhc/docker-standalone && docker compose -f docker-compose-nodejs.yml build --no-cache
+cd /opt/lhc/docker-standalone && docker compose -f docker-compose-nodejs.yml up -d --no-deps --force-recreate web
 ```
 
 Remember to automated SSL issuing workflow :)
