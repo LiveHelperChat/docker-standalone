@@ -28,6 +28,8 @@ services:
         soft: 65535
         hard: 65535
     env_file: .env
+    deploy:
+        replicas: 1
     volumes:
       - ./livehelperchat/lhc_web:/code
       - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
