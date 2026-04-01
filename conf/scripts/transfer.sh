@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 fileCron='/code/running-workflow-transfer'
 
 for i in {1..30}

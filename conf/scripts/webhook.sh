@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 fileCronHook='/code/running-webhook'
 
