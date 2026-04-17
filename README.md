@@ -131,7 +131,15 @@ Nginx and PHP-FPM status endpoints are available from within the Docker network 
 
 The allowed IPs are configured directly in the nginx conf files (`conf/nginx/site-nodejs.conf`, `conf/nginx/site.conf`, `conf/nginx/site-ssl.conf`) under the `nginx_status` and `fpm-status` location blocks. By default private network ranges and the Docker host IP are allowed.
 
-Open a shell in the nginx container:
+To get overview of docker containers
+
+```shell
+ docker stats
+```
+
+Also check server files limits https://gemini.google.com/share/9f106a446951
+
+Open a shell in the nginx container. Get yours name first `docker ps`:
 ```shell
 docker exec -it docker-standalone-web-1 /bin/bash
 ```
