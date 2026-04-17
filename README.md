@@ -125,6 +125,58 @@ cd /opt/lhc/docker-standalone && docker compose -f docker-compose-nodejs.yml dow
 cd /opt/lhc/docker-standalone && docker compose -f docker-compose-nodejs.yml up -d
 ```
 
+## How to monitor server status?
+
+Nginx and PHP-FPM status endpoints are available from within the Docker network (e.g. from inside any container) or from the host machine.
+
+The allowed IPs are configured directly in the nginx conf files (`conf/nginx/site-nodejs.conf`, `conf/nginx/site.conf`, `conf/nginx/site-ssl.conf`) under the `nginx_status` and `fpm-status` location blocks. By default private network ranges and the Docker host IP are allowed.
+
+Open a shell in the nginx container:
+```shell
+docker exec -it docker-standalone-web-1 /bin/bash
+```
+
+Then run any of the following:
+
+```shell
+# PHP-FPM status (pool summary: accepted conn, active/idle processes, req/sec since start)
+curl http://web/fpm-status
+
+# PHP-FPM status with per-worker details (pid, state, last URI, cpu, memory)
+curl 'http://web/fpm-status?full'
+
+# PHP-FPM status as JSON (useful for scripts and monitoring tools)
+curl 'http://web/fpm-status?json'
+
+# PHP-FPM status in Prometheus metrics format
+curl 'http://web/fpm-status?prometheus'
+
+# Nginx connection/request counts
+curl http://web/nginx_status
+```
+
+To calculate **real-time requests per second for php-fpm**, poll `accepted conn` twice and divide by the interval:
+```shell
+A=0; while true; do \
+  B=$(curl -s 'http://web/fpm-status?json' | grep -o '"accepted conn":[0-9]*' | grep -o '[0-9]*'); \
+  [ "$A" -gt 0 ] && awk "BEGIN {printf \"req/s: %.2f\n\", $B - $A}"; \
+  A=$B; sleep 1; \
+done
+```
+
+For nginx calculate **real-time requests per second**:
+```shell
+A=0; while true; do \
+  B=$(curl -s 'http://web/nginx_status' | awk '/accepts handled requests/{getline; print $3}'); \
+  [ "$A" -gt 0 ] && awk "BEGIN {printf \"req/s: %.2f\n\", $B - $A}"; \
+  A=$B; sleep 1; \
+done
+```
+To allow additional IPs, edit the `allow` lines in the relevant nginx conf file and recreate the web container:
+```shell
+docker compose -f docker-compose-nodejs.yml up -d --no-deps --force-recreate web
+```
+
 ## My mails are not sending?
 
 You have to edit back office mail settings and use SMTP.
