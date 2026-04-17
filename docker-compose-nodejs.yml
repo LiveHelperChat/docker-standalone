@@ -36,6 +36,8 @@ services:
       - ./NodeJS-Helper/nodejshelper:/code/extension/nodejshelper
       - ./conf/scripts:/scripts
       - ./conf/php-fpm/zz-lhc.conf:/usr/local/etc/php-fpm.d/zz-lhc.conf
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
     networks:
       - code-network
     restart: always
@@ -65,6 +67,8 @@ services:
       - ./NodeJS-Helper/nodejshelper:/code/extension/nodejshelper
       - ./conf/scripts:/scripts
       - ./conf/php/cronjob.ini:/usr/local/etc/php/conf.d/zz-lhc.ini
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
     networks:
       - code-network
     restart: always
@@ -83,6 +87,8 @@ services:
       - ./conf/scripts:/scripts
       - ./.env:/scripts/.env:ro
       - ./conf/php/resque.ini:/usr/local/etc/php/conf.d/zz-lhc.ini
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
     networks:
       - code-network
     depends_on:
