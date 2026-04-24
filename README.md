@@ -194,6 +194,11 @@ To stream PHP error logs in real time:
 docker compose -f docker-compose-nodejs.yml logs php
 ```
 
+To stream nginx errors in real time
+```shell
+docker compose -f docker-compose-nodejs.yml logs web
+```
+
 To find the raw log file path on the host:
 ```shell
 docker inspect --format='{{.LogPath}}' $(docker compose -f docker-compose-nodejs.yml ps -q php)
