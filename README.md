@@ -185,6 +185,30 @@ To allow additional IPs, edit the `allow` lines in the relevant nginx conf file 
 docker compose -f docker-compose-nodejs.yml up -d --no-deps --force-recreate web
 ```
 
+## PHP-FPM error logs
+
+PHP errors are logged to **stderr**, which Docker captures automatically. The `php` service is configured with log rotation via Docker's `json-file` driver (`max-size: 50m`, `max-file: 5`), capping total log storage at ~250MB.
+
+To stream PHP error logs in real time:
+```shell
+docker compose -f docker-compose-nodejs.yml logs php
+```
+
+To find the raw log file path on the host:
+```shell
+docker inspect --format='{{.LogPath}}' $(docker compose -f docker-compose-nodejs.yml ps -q php)
+```
+The file is located under `/var/lib/docker/containers/<container-id>/<container-id>-json.log` and rotated files are named `...-json.log.1`, `...-json.log.2`, etc. Root access is required to read them directly.
+
+To change log rotation limits, edit the `logging` block in `docker-compose-standard.yml` (or `docker-compose-nodejs.yml`) under the `php` service:
+```yaml
+logging:
+    driver: json-file
+    options:
+        max-size: "50m"
+        max-file: "5"
+```
+
 ## My mails are not sending?
 
 You have to edit back office mail settings and use SMTP.
