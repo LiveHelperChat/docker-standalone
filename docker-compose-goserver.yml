@@ -1,0 +1,213 @@
+# Same stack as docker-compose-nodejs.yml, but the `nodejshelper` service (NodeJS
+# SocketCluster + workers + brokers) is replaced by the Go rewrite of it:
+#   NodeJS-Helper/nodejshelper/serversc/go-server  ->  service `golhchelper`
+#
+# Usage (identical to the NodeJS variant, install-nodejs.sh clones both extensions):
+#   cp .env.default .env   # set LHC_SECRET_HASH to the value used at install time
+#   ./install-nodejs.sh    # `git -C NodeJS-Helper pull` first if that clone predates
+#                          # nodejshelper/serversc/go-server
+#   docker compose -f docker-compose-goserver.yml up -d
+#
+# The browser still talks to nginx only: /socketcluster/ is proxied to the Go server,
+# so settings -> NodeJS Helper (hostname/port/path) stay exactly the same.
+services:
+  web:
+    image: nginx:latest
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+    env_file: .env
+    ports:
+      - "${LHC_PUBLIC_PORT}:80"
+    volumes:
+      - ./livehelperchat/lhc_web:/code
+      - ./conf/nginx/site-nodejs.conf:/etc/nginx/conf.d/default.conf
+      - ./conf/nginx/mime.types:/etc/nginx/mime.types
+      - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - db
+      - php
+      - php-cronjob
+    networks:
+      - code-network
+    restart: always
+  php:
+    build: ./Dockerfiles/php
+    image: remdex/livehelperchat-php:latest
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+    env_file: .env
+    deploy:
+        replicas: 1
+    volumes:
+      - ./livehelperchat/lhc_web:/code
+      - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
+      - ./NodeJS-Helper/nodejshelper:/code/extension/nodejshelper
+      - ./conf/scripts:/scripts
+      - ./conf/php-fpm/zz-lhc.conf:/usr/local/etc/php-fpm.d/zz-lhc.conf
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
+    networks:
+      - code-network
+    restart: always
+  cobrowse:
+    build: ./Dockerfiles/cobrowse
+    image: remdex/livehelperchat-cobrowse:latest
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    ports:
+      - 127.0.0.1:31130:31130
+    networks:
+      - code-network
+    restart: always
+  php-cronjob:
+    build: ./Dockerfiles/cronjob
+    image: remdex/livehelperchat-php-cronjob:latest
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    env_file: .env
+    volumes:
+      - ./livehelperchat/lhc_web:/code
+      - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
+      - ./NodeJS-Helper/nodejshelper:/code/extension/nodejshelper
+      - ./conf/scripts:/scripts
+      - ./conf/php/cronjob.ini:/usr/local/etc/php/conf.d/zz-lhc.ini
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
+    networks:
+      - code-network
+    restart: always
+  php-resque:
+    build: ./Dockerfiles/php-resque
+    image: remdex/livehelperchat-php-resque:latest
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    env_file: .env
+    volumes:
+      - ./livehelperchat/lhc_web:/code
+      - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
+      - ./NodeJS-Helper/nodejshelper:/code/extension/nodejshelper
+      - ./conf/scripts:/scripts
+      - ./.env:/scripts/.env:ro
+      - ./conf/php/resque.ini:/usr/local/etc/php/conf.d/zz-lhc.ini
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
+    networks:
+      - code-network
+    depends_on:
+      - db
+      - redis
+    restart: always
+  golhchelper:
+    build: ./NodeJS-Helper/nodejshelper/serversc/go-server
+    image: remdex/livehelperchat-golhchelper:latest
+    # One file descriptor per websocket connection - Docker's default soft limit of 1024
+    # is reached quickly.
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+    env_file: .env
+    environment:
+      # Has to be identical to `site.secrethash` (installed from LHC_SECRET_HASH), or
+      # every websocket `login` fails. `:?` stops `up` with a clear message instead of
+      # silently refusing to authenticate. A `$` in the value must be single quoted in
+      # .env, otherwise compose interpolates it and mangles the hash.
+      SECRET_HASH: "${LHC_SECRET_HASH:?set LHC_SECRET_HASH in .env - it must match site.secrethash}"
+      # Optional: a fixed token signing key so browser sessions survive a restart.
+      # Empty means a random key per start (what SocketCluster did), clients just log in
+      # again. Single quote it in .env as well when it contains `$`.
+      AUTH_KEY: "${AUTH_KEY:-}"
+      # Same switch as server.js `trackVisitors` - keep it off on busy installs.
+      TRACK_VISITORS: "${LHC_NODEJS_TRACK_VISITORS:-0}"
+      # debug|info|warn|error. debug logs one line per websocket connect/disconnect.
+      LOG_LEVEL: "${LOG_LEVEL:-info}"
+      SOCKETCLUSTER_PORT: "8000"
+      # Must be the same Redis as `connect_db` in
+      # extension/nodejshelper/settings/settings.ini.php (db 0 by default).
+      REDIS_HOST: "${REDIS_HOST:-redis}"
+      REDIS_PORT: "${REDIS_PORT:-6379}"
+      REDIS_PASS: "${REDIS_PASS:-}"
+      REDIS_USER: "${REDIS_USER:-}"
+      REDIS_DB: "${REDIS_DB:-0}"
+      # Optional tunables, see the GO WEBSOCKET SERVER SETTINGS section of .env.default.
+      ORIGINS: "${ORIGINS:-*:*}"
+      STRICT_CHANNEL_BINDING: "${STRICT_CHANNEL_BINDING:-true}"
+      RESTRICT_CLIENT_PUBLISH: "${RESTRICT_CLIENT_PUBLISH:-false}"
+      SOCKET_SEND_BUFFER: "${SOCKET_SEND_BUFFER:-256}"
+    depends_on:
+      redis:
+        condition: service_healthy
+    # ports:
+      # Optional. nginx already proxies /socketcluster/ to this service, so publishing is
+      # only needed to reach /health-check (503 while the Redis bridge is down) directly.
+      # Keep the host port outside LHC_PUBLIC_PORT / LHC_NODE_JS_PORT.
+      # - "127.0.0.1:${LHC_GO_HELPER_PORT:-8090}:8000"
+    networks:
+      code-network:
+        # conf/nginx/site-nodejs.conf proxies to http://nodejshelper:8000/socketcluster/,
+        # the alias keeps that file (and the NodeJS variant) untouched. Do not run both
+        # compose files at the same time - the alias would be ambiguous.
+        aliases:
+          - nodejshelper
+    restart: always
+  redis:
+    image: "redis:alpine"
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - code-network
+    restart: always
+  db:
+    image: mariadb
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    env_file: .env
+    environment:
+      TZ: UTC
+    volumes:
+      - ./dbdata:/var/lib/mysql
+    ports:
+      - 127.0.0.1:3307:3306
+    command:
+      - "--innodb-buffer-pool-size=256M"
+    networks:
+      - code-network
+    restart: always
+networks:
+  code-network:
+    driver: bridge
