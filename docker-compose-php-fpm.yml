@@ -1,0 +1,21 @@
+services:
+  php:
+    build: ./Dockerfiles/php
+    image: remdex/livehelperchat-php:latest
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+    env_file: .env
+    volumes:
+      - ./livehelperchat/lhc_web:/code
+      - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
+      - ./conf/scripts:/scripts
+      - ./conf/php-fpm/zz-lhc.conf:/usr/local/etc/php-fpm.d/zz-lhc.conf
+    network_mode: host
+    restart: always
