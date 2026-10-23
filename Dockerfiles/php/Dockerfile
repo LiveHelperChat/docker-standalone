@@ -4,8 +4,6 @@
 FROM php:8.5-fpm AS builder
 
 ARG DEBIAN_FRONTEND=noninteractive
-  apt -qy install git unzip cron zlib1g-dev curl procps libzip-dev libonig-dev libpng-dev libwebp-dev libjpeg62-turbo-dev libxpm-dev libfreetype6-dev libkrb5-dev libldap2-dev imagemagick libmagickwand-dev libheif-dev && \
-    docker-php-ext-install sockets bcmath pcntl zip mbstring mysqli pdo pdo_mysql ldap && \
 
 # Build dependencies + Sury repo (needed for libc-client-dev)
 RUN apt-get update && apt-get install -y --no-install-recommends \
