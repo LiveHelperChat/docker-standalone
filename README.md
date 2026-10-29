@@ -31,6 +31,23 @@ This is dockerized version of Live Helper Chat. It includes these images
      * **Optional**. Run `docker compose -f docker-compose-standard.yml build --no-cache` to build from scratch. Build is optional. You might need it you are running on `linux/arm64` as I only provide `linux/amd64` architecture
      * Run `docker compose -f docker-compose-standard.yml pull && docker-compose -f docker-compose-standard.yml up`
 
+### PHP based images (php, php-cronjob, php-resque)
+
+All three images are built from the same `Dockerfiles/php/Dockerfile` using different build
+targets - `runtime` (php-fpm), `cronjob` and `resque` (both add `cron` on top of the exact same
+PHP build). That way a cron/resque container can never end up on a different PHP build than the
+web container, which is how `sqlsrv`/`pdo_sqlsrv` used to go missing from them.
+
+```shell
+docker compose -f docker-compose-nodejs.yml build php php-cronjob php-resque
+```
+
+The `runtime` target verifies at build time that `sqlsrv`, `pdo_sqlsrv`, `imagick`, `redis` and
+`imap` are loaded, so a broken extension build fails the image instead of a cron job later.
+
+If you build the images yourself, **skip `docker compose pull`** - it would replace the images you
+just built with the published ones from Docker Hub.
+
 * You will need to install composer dependencies:
   1. Open a shell in the docker container
      ```shell

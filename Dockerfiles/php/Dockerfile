@@ -1,4 +1,13 @@
 ############################
+# Build targets (use --target / compose build.target):
+#   runtime  - php-fpm image used by the `php` service (DEFAULT for compose)
+#   cronjob  - `php-cronjob` service (same PHP build + cron)
+#   resque   - `php-resque` service (same PHP build + cron)
+# The last stage in this file is `resque`, so a plain `docker build` without
+# --target gives you the resque image - prefer the compose files.
+############################
+
+############################
 # Stage 1: Build
 ############################
 FROM php:8.5-fpm AS builder
@@ -68,3 +77,45 @@ COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions
 COPY --from=builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
 
 RUN mkdir /code && chown www-data:www-data /code
+
+# Fail the build instead of silently shipping an image without an extension.
+# sqlsrv/pdo_sqlsrv used to be missing from the cron/resque images because they
+# were built FROM an upstream image instead of this one.
+RUN php -r 'foreach (["sqlsrv", "pdo_sqlsrv", "imagick", "redis", "imap"] as $ext) { if (!extension_loaded($ext)) { fwrite(STDERR, "missing PHP extension: $ext\n"); exit(1); } }'
+
+############################
+# Stage 3: cron based services (php-cronjob, php-resque)
+############################
+# These are the exact same PHP build as the php-fpm image above - they only add
+# cron on top. Keeping them here guarantees they can never be built on top of a
+# different (upstream) `remdex/livehelperchat-php` image that lacks extensions.
+FROM runtime AS cron-base
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends cron; \
+    rm -rf /var/lib/apt/lists/*; \
+    touch /var/log/cron.log
+
+# LHC background jobs (workflow, webhook, transfer, archive, stats, ...)
+FROM cron-base AS cronjob
+
+COPY cron/cronjob.cron /etc/cron.d/lhc
+RUN set -eux; \
+    chown root:root /etc/cron.d/lhc; \
+    chmod 0644 /etc/cron.d/lhc
+
+CMD ["cron", "-f"]
+
+# Resque workers are supervised by cron (resque.sh starts/keeps them alive,
+# the 07:40 job recreates the lock file so workers get restarted daily)
+FROM cron-base AS resque
+
+COPY cron/resque.cron /etc/cron.d/lhc
+RUN set -eux; \
+    chown root:root /etc/cron.d/lhc; \
+    chmod 0644 /etc/cron.d/lhc
+
+CMD ["cron", "-f"]

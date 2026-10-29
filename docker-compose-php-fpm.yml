@@ -1,6 +1,8 @@
 services:
   php:
-    build: ./Dockerfiles/php
+    build:
+      context: ./Dockerfiles/php
+      target: runtime
     image: remdex/livehelperchat-php:latest
     ulimits:
       nofile:

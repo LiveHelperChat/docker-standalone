@@ -25,7 +25,9 @@ services:
             - code-network
         restart: always
     php:
-        build: ./Dockerfiles/php
+        build:
+            context: ./Dockerfiles/php
+            target: runtime
         image: remdex/livehelperchat-php:latest
         ulimits:
           nofile:
@@ -46,7 +48,9 @@ services:
             - code-network
         restart: always
     php-cronjob:
-        build: ./Dockerfiles/cronjob
+        build:
+            context: ./Dockerfiles/php
+            target: cronjob
         image: remdex/livehelperchat-php-cronjob:latest
         ulimits:
           nofile:
@@ -74,7 +78,9 @@ services:
             - code-network
         restart: always
     php-resque:
-        build: ./Dockerfiles/php-resque
+        build:
+            context: ./Dockerfiles/php
+            target: resque
         image: remdex/livehelperchat-php-resque:latest
         ulimits:
           nofile:
