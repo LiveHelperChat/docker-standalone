@@ -62,6 +62,8 @@ services:
             - ./lhc-php-resque/lhcphpresque:/code/extension/lhcphpresque
             - ./conf/scripts:/scripts
             - ./conf/php/cronjob.ini:/usr/local/etc/php/conf.d/zz-lhc.ini
+            # live crontab - edit on the host, then `docker compose up -d` / restart the container
+            - ./Dockerfiles/php/cron/cronjob:/etc/cron.d:ro
         networks:
             - code-network
         restart: always
@@ -93,6 +95,8 @@ services:
             - ./conf/scripts:/scripts
             - ./.env:/scripts/.env:ro
             - ./conf/php/resque.ini:/usr/local/etc/php/conf.d/zz-lhc.ini
+            # live crontab - edit on the host, then `docker compose up -d` / restart the container
+            - ./Dockerfiles/php/cron/resque:/etc/cron.d:ro
         networks:
             - code-network
         restart: always

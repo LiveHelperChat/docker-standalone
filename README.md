@@ -48,6 +48,33 @@ The `runtime` target verifies at build time that `sqlsrv`, `pdo_sqlsrv`, `imagic
 If you build the images yourself, **skip `docker compose pull`** - it would replace the images you
 just built with the published ones from Docker Hub.
 
+### Editing cronjobs without rebuilding
+
+The crontabs are bind-mounted from the host, so they can be changed at any time - the image only
+carries a fallback copy:
+
+| host path | container path | service |
+| --- | --- | --- |
+| `Dockerfiles/php/cron/cronjob/` | `/etc/cron.d` | `php-cronjob` |
+| `Dockerfiles/php/cron/resque/` | `/etc/cron.d` | `php-resque` |
+
+Each directory holds a single file called `lhc` (the name cron expects; Debian cron ignores files
+with a dot in the name). Edit it and either wait - `cron` re-reads a changed crontab within a
+minute - or restart the container:
+
+```shell
+docker compose -f docker-compose-standard.yml up -d --force-recreate php-cronjob
+```
+
+Notes:
+
+* Mount the **directory**, not the single file. A single-file bind mount pins the inode, so an
+  editor that saves by replacing the file leaves the container running the old crontab.
+* Keep the file `root:root` and mode `0644` - Debian `cron` silently ignores crontabs that are
+  group/world writable.
+* Only `lhc` may live in those directories: everything in `/etc/cron.d` is executed, so a
+  `resque` entry must not end up in the `php-cronjob` directory.
+
 * You will need to install composer dependencies:
   1. Open a shell in the docker container
      ```shell

@@ -102,7 +102,9 @@ RUN set -eux; \
 # LHC background jobs (workflow, webhook, transfer, archive, stats, ...)
 FROM cron-base AS cronjob
 
-COPY cron/cronjob.cron /etc/cron.d/lhc
+# cron/cronjob/ is also bind-mounted at runtime (see docker-compose-*.yml),
+# so this COPY is only the fallback for `docker run` without the volume.
+COPY cron/cronjob/lhc /etc/cron.d/lhc
 RUN set -eux; \
     chown root:root /etc/cron.d/lhc; \
     chmod 0644 /etc/cron.d/lhc
@@ -113,7 +115,9 @@ CMD ["cron", "-f"]
 # the 07:40 job recreates the lock file so workers get restarted daily)
 FROM cron-base AS resque
 
-COPY cron/resque.cron /etc/cron.d/lhc
+# cron/resque/ is also bind-mounted at runtime (see docker-compose-*.yml),
+# so this COPY is only the fallback for `docker run` without the volume.
+COPY cron/resque/lhc /etc/cron.d/lhc
 RUN set -eux; \
     chown root:root /etc/cron.d/lhc; \
     chmod 0644 /etc/cron.d/lhc

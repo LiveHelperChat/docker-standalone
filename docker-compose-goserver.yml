@@ -93,6 +93,8 @@ services:
       - ./NodeJS-Helper/nodejshelper:/code/extension/nodejshelper
       - ./conf/scripts:/scripts
       - ./conf/php/cronjob.ini:/usr/local/etc/php/conf.d/zz-lhc.ini
+      # live crontab - edit on the host, then `docker compose up -d` / restart the container
+      - ./Dockerfiles/php/cron/cronjob:/etc/cron.d:ro
 #    extra_hosts:
 #      - "host.docker.internal:host-gateway"
     networks:
@@ -115,6 +117,8 @@ services:
       - ./conf/scripts:/scripts
       - ./.env:/scripts/.env:ro
       - ./conf/php/resque.ini:/usr/local/etc/php/conf.d/zz-lhc.ini
+      # live crontab - edit on the host, then `docker compose up -d` / restart the container
+      - ./Dockerfiles/php/cron/resque:/etc/cron.d:ro
 #    extra_hosts:
 #      - "host.docker.internal:host-gateway"
     networks:
