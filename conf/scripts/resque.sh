@@ -27,6 +27,7 @@ numberProcess=$(ps aux | grep "[0-9] resque-1.2: *" | awk '{print $2}' | wc -l)
 if (( $numberProcess > $workers_count ));
 then
   echo "To many running process..."
+  echo "$(tail -1000 /code/cache/resque.log)" > /code/cache/resque.log
   exit 1
 fi
 

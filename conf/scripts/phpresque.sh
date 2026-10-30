@@ -23,4 +23,4 @@ fi
 echo "Running live site cronjobs"
 ulimit -n 65535
 cd /code
-REDIS_BACKEND=redis:6379 REDIS_BACKEND_DB=1 INTERVAL=1 COUNT="$workers_count" VERBOSE=0 QUEUE="$queue_name" /usr/local/bin/php resque.php 2>&1
+REDIS_BACKEND=redis:6379 REDIS_BACKEND_DB=1 INTERVAL=1 COUNT="$workers_count" VERBOSE=0 QUEUE="$queue_name" /usr/local/bin/php resque.php >> /code/cache/resque.log 2>&1
