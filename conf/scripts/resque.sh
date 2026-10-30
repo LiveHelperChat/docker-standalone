@@ -43,6 +43,7 @@ else
     PIDS=`ps aux | grep '[0-9] resque-1.2: *'`
     if [ -z "$PIDS" ]; then
        echo "Starting resque"
+       echo "$(tail -1000 /code/cache/resque.log)" > /code/cache/resque.log
        cd /scripts/ && ./phpresque.sh &
     fi
 fi
