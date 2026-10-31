@@ -37,6 +37,7 @@ if [ -f $fileLock ];
 then
     kill -9 $(ps aux | grep "/usr/local/bin/php resque.php" | awk '{print $2}')
     kill -9 $(ps aux | grep "[0-9] resque-1.2: *" | awk '{print $2}')
+    echo "$(tail -1000 /code/cache/resque.log)" > /code/cache/resque.log
     cd /scripts/ && ./phpresque.sh &
     rm -f $fileLock;
 else
