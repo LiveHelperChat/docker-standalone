@@ -60,6 +60,11 @@ services:
       nofile:
         soft: 65535
         hard: 65535
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
     ports:
       - 127.0.0.1:31130:31130
     networks:
@@ -74,6 +79,11 @@ services:
       nofile:
         soft: 65535
         hard: 65535
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
     env_file: .env
     volumes:
       - ./livehelperchat/lhc_web:/code
@@ -97,6 +107,11 @@ services:
       nofile:
         soft: 65535
         hard: 65535
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
     env_file: .env
     volumes:
       - ./livehelperchat/lhc_web:/code
@@ -122,6 +137,11 @@ services:
       nofile:
         soft: 65535
         hard: 65535
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
     env_file: .env
     depends_on:
       - redis
@@ -134,6 +154,11 @@ services:
       nofile:
         soft: 65535
         hard: 65535
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
     networks:
       - code-network
     restart: always
@@ -143,6 +168,11 @@ services:
       nofile:
         soft: 65535
         hard: 65535
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
     env_file: .env
     environment:
       TZ: UTC
