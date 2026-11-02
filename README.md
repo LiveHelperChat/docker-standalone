@@ -75,6 +75,44 @@ Notes:
 * Only `lhc` may live in those directories: everything in `/etc/cron.d` is executed, so a
   `resque` entry must not end up in the `php-cronjob` directory.
 
+### Redis persistence (PHP sessions)
+
+PHP sessions are stored in Redis - `conf/php-fpm/zz-lhc.conf` sets
+`session.save_handler = redis` and `session.save_path = tcp://redis:6379`. To keep them
+across restarts and container recreation, the `redis` service bind mounts `./redisdata` at
+`/data` (same idea as `./dbdata` for MySQL) and runs with `--appendonly yes`. Without it, a
+`docker compose up -d` recreate wipes every logged-in visitor.
+
+* `docker compose down` keeps the data; `./cleanup.sh` deletes it (all sessions are
+  dropped and everybody has to log in again).
+* The fsync policy comes from `REDIS_APPEND_FSYNC` in `.env` (see `.env.default`), default
+  `everysec`. Use `always` for maximum durability, `no` for maximum throughput - the file
+  itself is always written, this only controls when it is flushed to disk.
+* Verify with `docker compose exec redis redis-cli info persistence` (`aof_enabled:1`,
+  `aof_last_write_status:ok`) or `docker compose exec redis redis-cli dbsize`.
+* The data is a plain host folder, so it can be backed up/copied like the DB:
+  `tar czf redisdata.tgz redisdata` while the container is stopped, or just copy
+  `redisdata/appendonlydir/`.
+* `docker compose down -v` does **not** remove it (bind mounts are never deleted by
+  Compose); use `./cleanup.sh` or `rm -rf redisdata`.
+* Upgrading an existing install: the old data sits in the previous container's writable
+  layer. Copying only `dump.rdb` is **not** enough - with `--appendonly yes` and no AOF
+  present Redis starts with an empty dataset and ignores the RDB. Convert the live instance
+  first, then copy `appendonlydir`:
+
+  ```shell
+  # 1. let the running Redis rewrite its current dataset into the AOF
+  docker exec docker-standalone-redis-1 redis-cli config set appendonly yes
+  until [ "$(docker exec docker-standalone-redis-1 redis-cli info persistence \
+    | awk -F: '/^aof_rewrite_in_progress/{gsub(/\r/,"",$2);print $2}')" = 0 ]; do sleep 1; done
+  # 2. copy the data directory to the host folder
+  mkdir -p redisdata
+  docker cp docker-standalone-redis-1:/data/. ./redisdata/
+  # 3. recreate the service with the bind mount
+  docker compose -f docker-compose-standard.yml up -d redis
+  docker exec docker-standalone-redis-1 redis-cli dbsize   # same count as before
+  ```
+
 * You will need to install composer dependencies:
   1. Open a shell in the docker container
      ```shell

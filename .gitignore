@@ -1,5 +1,6 @@
 .env
 /dbdata
+/redisdata
 /livehelperchat
 /lhc-php-resque
 /NodeJS-Helper

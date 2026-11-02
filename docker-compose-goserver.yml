@@ -211,6 +211,14 @@ services:
       options:
         max-size: "50m"
         max-file: "5"
+    # PHP sessions live in Redis (conf/php-fpm/zz-lhc.conf sets
+    # session.save_handler=redis), so without a persistent ./data every session is
+    # lost when this container is recreated. Stored on the host in ./redisdata,
+    # next to ./dbdata. Append-only file keeps at most one fsync window of writes.
+    # REDIS_APPEND_FSYNC: everysec (Redis default) | always | no - see .env.default.
+    command: ["redis-server", "--appendonly", "yes", "--appendfsync", "${REDIS_APPEND_FSYNC:-everysec}"]
+    volumes:
+      - ./redisdata:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
