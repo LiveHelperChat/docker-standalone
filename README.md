@@ -113,6 +113,60 @@ across restarts and container recreation, the `redis` service bind mounts `./red
   docker exec docker-standalone-redis-1 redis-cli dbsize   # same count as before
   ```
 
+#### "Bad file format reading the append only file" (crash loop)
+
+AOF is a log of write commands. If the process dies in the middle of appending one, the
+file ends with a half-written command and Redis refuses to start:
+
+```
+# Bad file format reading the append only file appendonlydir/appendonly.aof.4.incr.aof at offset 55526797
+redis-1 exited with code 1 (restarting)
+```
+
+The write itself is fine - the usual causes are an **unclean stop**: `docker kill`/`rm -f`,
+`sigkill` after the 10s stop timeout, container/host OOM-kill, power loss, or a **full
+disk** (the write returns `ENOSPC` half way). It is not caused by normal session churn.
+
+What this repo already does to avoid it:
+
+* `stop_grace_period: 1m` on `redis` - `docker stop` gives Redis a minute to fsync and exit
+  instead of SIGKILLing it after the compose default of 10s.
+* `--aof-load-corrupt-tail-max-size` (`REDIS_AOF_CORRUPT_TAIL_MAX`, default `134217728` =
+  128 MiB, **bytes** - the option has no `mb` suffix) - a
+  torn tail is truncated at startup and Redis comes up normally, losing only the last few
+  commands, instead of crash-looping until an operator runs `redis-check-aof`.
+
+Still up to you on the host:
+
+* **Never** `docker kill`, `docker rm -f` or `systemctl kill` the redis container; use
+  `docker stop` / `docker compose stop redis`.
+* Keep free space: Redis writes `appendonly.aof.*.incr.aof` continuously and needs ~2x the
+  dataset during a rewrite. Watch `df` and `redis-cli info persistence | grep aof_current_size`;
+  once the disk is full Redis logs `Can't write to the AOF file, disk full?` and every
+  later restart can be corrupt. Keep >= 10-15% free.
+* Do not starve it of RAM: an OOM kill is an unclean stop. Check
+  `dmesg -T | grep -i 'killed process'`. Cap the dataset with `maxmemory` if the box is
+  shared (sessions expire on their own, `volatile-*` policies only evict keys with a TTL).
+* Session-only data does not need `appendfsync always`; `everysec` (default) is the right
+  trade-off and also the safest for disk wear.
+
+If it already happened (recovery, loses only the torn tail):
+
+```shell
+docker compose -f docker-compose-standard.yml stop redis
+tar czf redisdata-$(date +%F-%H%M).tgz redisdata            # never fix without a backup
+printf 'y\n' | docker run --rm -i -v "$PWD/redisdata":/data redis:alpine \
+  redis-check-aof --fix /data/appendonlydir/appendonly.aof.manifest
+docker compose -f docker-compose-standard.yml up -d redis
+docker exec docker-standalone-redis-1 redis-cli dbsize       # sanity check
+```
+
+`--fix` truncates the file at the first bad command; everything before it is kept. If the
+corruption is in the middle of the file (disk error) rather than the tail, the fix still
+works but you lose the commands after that point - restore `./redisdata` from backup
+instead if that matters. `dump.rdb` next to `appendonlydir/` is a second, independent copy
+written by the normal snapshot rules.
+
 * You will need to install composer dependencies:
   1. Open a shell in the docker container
      ```shell

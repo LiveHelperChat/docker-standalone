@@ -164,7 +164,21 @@ services:
     # lost when this container is recreated. Stored on the host in ./redisdata,
     # next to ./dbdata. Append-only file keeps at most one fsync window of writes.
     # REDIS_APPEND_FSYNC: everysec (Redis default) | always | no - see .env.default.
-    command: ["redis-server", "--appendonly", "yes", "--appendfsync", "${REDIS_APPEND_FSYNC:-everysec}"]
+    command:
+      - "redis-server"
+      - "--appendonly"
+      - "yes"
+      - "--appendfsync"
+      - "${REDIS_APPEND_FSYNC:-everysec}"
+      # Upstream default is 0 = refuse to start on a corrupt AOF tail, so one
+      # unclean shutdown (SIGKILL, power loss, full disk) becomes a crash loop.
+      # 128 MiB in BYTES (the option takes no unit suffix) truncates the torn
+      # tail at startup and loses only those commands.
+      - "--aof-load-corrupt-tail-max-size"
+      - "${REDIS_AOF_CORRUPT_TAIL_MAX:-134217728}"
+    # docker stop sends SIGTERM and Redis fsyncs + exits; the default 10s can
+    # expire first and SIGKILL it mid-write, which is what corrupts the AOF.
+    stop_grace_period: 1m
     volumes:
       - ./redisdata:/data
     networks:
