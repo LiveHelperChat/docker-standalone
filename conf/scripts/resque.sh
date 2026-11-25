@@ -33,12 +33,16 @@ fi
 
 fileLock="/code/cache/runresque.lock"
 
-if [ -f $fileLock ];
+failedJobs=$(cd /code && /usr/local/bin/php cron.php -s site_admin -e lhcphpresque -c cron/failed 2>/dev/null)
+failedJobs=${failedJobs:-0}
+
+if [ -f $fileLock ] || ([[ "$failedJobs" =~ ^[0-9]+$ ]] && (( failedJobs > 20 )));
 then
     kill -9 $(ps aux | grep "/usr/local/bin/php resque.php" | awk '{print $2}')
     kill -9 $(ps aux | grep "[0-9] resque-1.2: *" | awk '{print $2}')
     echo "$(tail -1000 /code/cache/resque.log)" > /code/cache/resque.log
     cd /scripts/ && ./phpresque.sh &
+    cd /code && /usr/local/bin/php cron.php -s site_admin -e lhcphpresque -c cron/reschedule
     rm -f $fileLock;
 else
     PIDS=`ps aux | grep '[0-9] resque-1.2: *'`
