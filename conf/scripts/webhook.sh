@@ -8,7 +8,7 @@ do
     then
       touch $fileCronHook;
       cd /code && /usr/local/bin/php cron.php -s site_admin -c cron/webhook >> cache/webhook.log
-      echo "$(tail -1000 cache/webhook.log)" > cache/webhook.log
+      echo "$(tail -1000 /code/cache/webhook.log)" > /code/cache/webhook.log
       rm -f $fileCronHook;
     else
       if [ `stat --format=%Y $fileCronHook` -le $(( `date +%s` - 30 )) ]; then
